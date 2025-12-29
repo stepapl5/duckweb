@@ -15,7 +15,6 @@
       --radius: 22px;
 
       --ok:#16a34a;
-      --warn:#f59e0b;
       --bad:#ef4444;
     }
     *{box-sizing:border-box}
@@ -30,26 +29,18 @@
       background: linear-gradient(180deg, var(--bg1), var(--bg2));
     }
 
-    /* clouds */
-    .cloud{
-      position:absolute; width:220px; height:70px;
-      background:#fff; border-radius:999px; opacity:.85;
-      box-shadow: 0 14px 40px rgba(2, 6, 23, .08);
-      animation: drift linear infinite;
-    }
+    .cloud{ position:absolute; width:220px; height:70px; background:#fff; border-radius:999px; opacity:.85;
+      box-shadow: 0 14px 40px rgba(2, 6, 23, .08); animation: drift linear infinite; }
     .cloud::before, .cloud::after{ content:""; position:absolute; background:#fff; border-radius:999px; }
     .cloud::before{ width:90px; height:90px; left:20px; top:-35px; }
     .cloud::after{ width:120px; height:120px; left:80px; top:-55px; }
     @keyframes drift{ from{ transform: translateX(-320px);} to{ transform: translateX(calc(100vw + 320px)); } }
 
-    .waves{
-      position:absolute; left:0; right:0; bottom:-1px;
-      height:35vh; pointer-events:none; opacity:.9;
-    }
+    .waves{ position:absolute; left:0; right:0; bottom:-1px; height:35vh; pointer-events:none; opacity:.9; }
 
     .card{
       position:relative;
-      width:min(700px, 94vw);
+      width:min(720px, 94vw);
       padding:16px;
       border-radius: var(--radius);
       background: var(--card);
@@ -59,50 +50,21 @@
       text-align:center;
     }
 
-    h1{
-      margin:6px 0 8px;
-      font-size: clamp(22px, 3.2vw, 32px);
-      letter-spacing: .2px;
-    }
-    .sub{
-      margin:0 0 10px;
-      color: var(--muted);
-      font-size: 14px;
-    }
+    h1{ margin:6px 0 6px; font-size: clamp(22px, 3.2vw, 32px); }
+    .sub{ margin:0 0 10px; color: var(--muted); font-size: 14px; }
 
-    /* tabs */
-    .tabs{
-      display:flex;
-      gap:10px;
-      justify-content:center;
-      margin: 10px 0 12px;
-      flex-wrap:wrap;
-    }
+    .tabs{ display:flex; gap:10px; justify-content:center; margin: 10px 0 12px; flex-wrap:wrap; }
     .tab{
-      border:none;
-      cursor:pointer;
-      border-radius: 999px;
-      padding: 10px 14px;
-      font-weight: 900;
-      background: rgba(255,255,255,.75);
-      color: var(--text);
-      border: 1px solid rgba(15, 23, 42, .08);
-      box-shadow: 0 10px 24px rgba(2,6,23,.08);
+      border:none; cursor:pointer; border-radius:999px; padding:10px 14px; font-weight:900;
+      background: rgba(255,255,255,.75); color: var(--text);
+      border: 1px solid rgba(15, 23, 42, .08); box-shadow: 0 10px 24px rgba(2,6,23,.08);
     }
-    .tab.active{
-      background: rgba(15, 23, 42, .92);
-      color:#fff;
-      border-color: rgba(15,23,42,0);
-    }
+    .tab.active{ background: rgba(15, 23, 42, .92); color:#fff; border-color: transparent; }
+
     .panel{ display:none; }
     .panel.active{ display:block; }
 
-    /* game area */
-    .game-wrap{
-      display:grid;
-      place-items:center;
-      margin: 8px auto 10px;
-    }
+    .game-wrap{ display:grid; place-items:center; margin: 8px auto 10px; }
     canvas{
       width:min(420px, 92vw);
       height:auto;
@@ -111,6 +73,7 @@
       border: 1px solid rgba(15, 23, 42, .10);
       box-shadow: 0 12px 30px rgba(2,6,23,.12);
       touch-action: manipulation;
+      outline: none;
     }
 
     .hud{
@@ -126,30 +89,16 @@
       font-size: 13px;
     }
 
-    .btn-row{
-      display:flex;
-      justify-content:center;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top: 10px;
-    }
+    .btn-row{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top: 10px; }
     .btn{
-      border:none;
-      cursor:pointer;
-      border-radius: 14px;
-      padding: 10px 14px;
-      font-weight: 900;
-      background: rgba(15, 23, 42, .92);
-      color:#fff;
-      box-shadow: 0 12px 30px rgba(2,6,23,.18);
+      border:none; cursor:pointer; border-radius: 14px; padding: 10px 14px; font-weight: 900;
+      background: rgba(15, 23, 42, .92); color:#fff; box-shadow: 0 12px 30px rgba(2,6,23,.18);
     }
     .btn.secondary{
-      background: rgba(255,255,255,.85);
-      color: var(--text);
+      background: rgba(255,255,255,.85); color: var(--text);
       border: 1px solid rgba(15, 23, 42, .10);
     }
 
-    /* forms */
     .form{
       width:min(520px, 92vw);
       margin: 10px auto 0;
@@ -160,44 +109,30 @@
       padding: 12px;
       box-shadow: 0 10px 24px rgba(2,6,23,.08);
     }
-    .row{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:flex-end;
-      margin-bottom: 10px;
-    }
-    label{
-      font-weight: 900;
-      font-size: 13px;
-      color: var(--muted);
-      display:block;
-      margin-bottom: 6px;
-    }
+    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; margin-bottom: 10px; }
+    label{ font-weight: 900; font-size: 13px; color: var(--muted); display:block; margin-bottom: 6px; }
     input{
-      width:100%;
-      padding: 10px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(15,23,42,.12);
-      outline:none;
-      font-weight: 900;
-      background: rgba(255,255,255,.9);
+      width:100%; padding: 10px 12px; border-radius: 14px;
+      border: 1px solid rgba(15,23,42,.12); outline:none; font-weight: 900; background: rgba(255,255,255,.9);
     }
-    .col{ flex: 1 1 200px; min-width: 200px; }
-    .msg{
-      margin-top: 6px;
-      font-weight: 900;
-      font-size: 13px;
-      color: var(--muted);
-    }
+    .col{ flex: 1 1 240px; min-width: 240px; }
+    .msg{ margin-top: 6px; font-weight: 900; font-size: 13px; color: var(--muted); }
     .msg.good{ color: var(--ok); }
     .msg.bad{ color: var(--bad); }
 
-    /* tiny footer hint */
-    .hint{
-      margin-top:10px;
-      font-size: 13px;
+    .hint{ margin-top:10px; font-size: 13px; color: var(--muted); }
+
+    .overlayTip{
+      width:min(420px, 92vw);
+      margin: 10px auto 0;
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.7);
+      border: 1px solid rgba(15, 23, 42, .08);
       color: var(--muted);
+      font-weight: 900;
+      font-size: 13px;
+      box-shadow: 0 10px 24px rgba(2,6,23,.08);
     }
   </style>
 </head>
@@ -208,32 +143,33 @@
 
   <div class="card">
     <h1>Duck WebApp 🦆</h1>
-    <div class="sub">Игра в стиле Flappy + перевод очков в рубли</div>
+    <div class="sub">Flappy Duck + перевод очков в рубли</div>
 
     <div class="tabs">
-      <button class="tab active" id="tabGame">Игра</button>
-      <button class="tab" id="tabRub">Перевод в рубли</button>
-      <button class="tab" id="tabPromo">Промокод</button>
+      <button class="tab active" id="tabGame" type="button">Игра</button>
+      <button class="tab" id="tabRub" type="button">Перевод в рубли</button>
+      <button class="tab" id="tabPromo" type="button">Промокод</button>
     </div>
 
     <!-- GAME -->
     <div class="panel active" id="panelGame">
       <div class="game-wrap">
-        <canvas id="cv" width="360" height="512" aria-label="Flappy Duck"></canvas>
+        <canvas id="cv" width="360" height="512"></canvas>
       </div>
 
       <div class="hud">
         <div>Очки: <span id="score">0</span></div>
         <div>Лучшее: <span id="best">0</span></div>
-        <div>Всего очков: <span id="total">0</span></div>
+        <div>Всего: <span id="total">0</span></div>
       </div>
 
       <div class="btn-row">
-        <button class="btn" id="restartBtn">Начать заново</button>
-        <button class="btn secondary" id="resetTotalBtn">Сбросить “всего”</button>
+        <button class="btn" id="startBtn" type="button">Старт</button>
+        <button class="btn secondary" id="restartBtn" type="button">Рестарт</button>
+        <button class="btn secondary" id="resetTotalBtn" type="button">Сбросить “всего”</button>
       </div>
 
-      <div class="hint">Управление: клик / тап / пробел. Цель — пролетать между трубами.</div>
+      <div class="overlayTip" id="tip">Нажми <b>Старт</b>. Во время игры: тап/клик по экрану или пробел — прыжок.</div>
     </div>
 
     <!-- RUB -->
@@ -241,23 +177,23 @@
       <div class="form">
         <div class="row">
           <div class="col">
-            <label>Мои очки (из игры)</label>
-            <input id="rubPoints" type="number" min="0" step="1" readonly />
+            <label>Мои очки (всего)</label>
+            <input id="rubPoints" type="number" readonly />
           </div>
           <div class="col">
-            <label>Цена за 1 очко (₽)</label>
-            <input id="rate" type="number" min="0" step="0.01" placeholder="например 0.50" />
+            <label>Курс</label>
+            <input id="rateFixed" type="text" readonly />
           </div>
         </div>
 
         <div class="row">
-          <button class="btn" id="calcBtn">Перевести в рубли</button>
-          <button class="btn secondary" id="refreshPointsBtn">Обновить мои очки</button>
+          <button class="btn" id="calcBtn" type="button">Перевести в рубли</button>
+          <button class="btn secondary" id="backToGame1" type="button">Выйти в игру</button>
         </div>
 
-        <div class="msg good" id="rubOut">Нажми «Перевести в рубли» — получишь сумму.</div>
+        <div class="msg good" id="rubOut">Нажми «Перевести в рубли».</div>
       </div>
-      <div class="hint">Это перевод <b>очков → рубли</b>.</div>
+      <div class="hint">Перевод идёт <b>только: очки → рубли</b>.</div>
     </div>
 
     <!-- PROMO -->
@@ -268,11 +204,12 @@
             <label>Введите промокод</label>
             <input id="promo" autocomplete="off" />
           </div>
-          <button class="btn" id="promoBtn">Активировать</button>
+          <button class="btn" id="promoBtn" type="button">Активировать</button>
+          <button class="btn secondary" id="backToGame2" type="button">Выйти в игру</button>
         </div>
-        <div class="msg" id="promoMsg"> </div>
+        <div class="msg" id="promoMsg"></div>
       </div>
-      <div class="hint">Промокод даёт бонус (можно активировать ограниченное число раз).</div>
+      <div class="hint">Промокод даёт бонус (ограничение по активациям).</div>
     </div>
   </div>
 
@@ -285,14 +222,15 @@
     // ---------- STORAGE ----------
     const K_BEST = 'fd_best';
     const K_TOTAL = 'fd_total';
-    const K_RATE = 'fd_rate';
-    const K_PROMO_USES = 'fd_promo_uses'; // 0..2
+    const K_PROMO_USES = 'fd_promo_uses';
 
-    // Промокод: НЕ ПИШЕМ его в интерфейсе.
-    // Он у тебя в голове :)
+    // фиксированный курс
+    const RUB_PER_POINT = 0.01;
+
+    // промокод (в интерфейсе НЕ показываем)
     const SECRET_CODE = 'тест';
     const PROMO_MAX_USES = 2;
-    const PROMO_BONUS_POINTS = 200; // бонус к "всего очков"
+    const PROMO_BONUS_POINTS = 200;
 
     // ---------- TABS ----------
     const tabGame = document.getElementById('tabGame');
@@ -303,28 +241,29 @@
     const panelPromo = document.getElementById('panelPromo');
 
     function setTab(name){
-      const isGame = name==='game';
-      const isRub = name==='rub';
-      const isPromo = name==='promo';
-      tabGame.classList.toggle('active', isGame);
-      tabRub.classList.toggle('active', isRub);
-      tabPromo.classList.toggle('active', isPromo);
+      tabGame.classList.toggle('active', name==='game');
+      tabRub.classList.toggle('active', name==='rub');
+      tabPromo.classList.toggle('active', name==='promo');
 
-      panelGame.classList.toggle('active', isGame);
-      panelRub.classList.toggle('active', isRub);
-      panelPromo.classList.toggle('active', isPromo);
+      panelGame.classList.toggle('active', name==='game');
+      panelRub.classList.toggle('active', name==='rub');
+      panelPromo.classList.toggle('active', name==='promo');
 
-      if (isRub) syncRubPoints();
+      if (name==='rub') syncRubPoints();
     }
 
     tabGame.addEventListener('click', ()=>setTab('game'));
     tabRub.addEventListener('click', ()=>setTab('rub'));
     tabPromo.addEventListener('click', ()=>setTab('promo'));
 
+    document.getElementById('backToGame1').addEventListener('click', ()=>setTab('game'));
+    document.getElementById('backToGame2').addEventListener('click', ()=>setTab('game'));
+
     // ---------- HUD ----------
     const scoreEl = document.getElementById('score');
     const bestEl = document.getElementById('best');
     const totalEl = document.getElementById('total');
+    const tipEl = document.getElementById('tip');
 
     let best = Number(localStorage.getItem(K_BEST) || 0);
     let total = Number(localStorage.getItem(K_TOTAL) || 0);
@@ -341,58 +280,13 @@
     // ---------- FLAPPY DUCK ----------
     const cv = document.getElementById('cv');
     const ctx = cv.getContext('2d');
-
-    // duck image (твой imgur можно заменить на прямую ссылку к файлу,
-    // но сейчас делаем "рисованную" утку через canvas, чтобы всегда работало)
-    function drawDuck(x,y,rot){
-      ctx.save();
-      ctx.translate(x,y);
-      ctx.rotate(rot);
-
-      // body
-      ctx.beginPath();
-      ctx.ellipse(0,0,18,14,0,0,Math.PI*2);
-      ctx.fillStyle = '#fbbf24';
-      ctx.fill();
-      // belly
-      ctx.beginPath();
-      ctx.ellipse(-2,3,10,8,0,0,Math.PI*2);
-      ctx.fillStyle = '#fde68a';
-      ctx.fill();
-
-      // head
-      ctx.beginPath();
-      ctx.ellipse(14,-8,10,9,0,0,Math.PI*2);
-      ctx.fillStyle = '#fbbf24';
-      ctx.fill();
-
-      // beak
-      ctx.beginPath();
-      ctx.ellipse(26,-6,8,4,0,0,Math.PI*2);
-      ctx.fillStyle = '#fb923c';
-      ctx.fill();
-
-      // eye
-      ctx.beginPath();
-      ctx.arc(16,-10,2.2,0,Math.PI*2);
-      ctx.fillStyle = '#0f172a';
-      ctx.fill();
-
-      ctx.restore();
-    }
-
     const W = cv.width, H = cv.height;
 
-    let state = 'ready'; // ready, play, over
+    // state: menu (стоит), play (игра), over (проиграл)
+    let state = 'menu';
     let score = 0;
 
-    const duck = {
-      x: 90,
-      y: H/2,
-      vy: 0,
-      r: 16
-    };
-
+    const duck = { x: 90, y: H/2, vy: 0, r: 16 };
     const GRAV = 0.45;
     const FLAP = -7.3;
 
@@ -401,49 +295,72 @@
     const GAP = 150;
     let spawnTimer = 0;
 
-    function resetGame(){
-      state = 'ready';
+    function drawDuck(x,y,rot){
+      ctx.save();
+      ctx.translate(x,y);
+      ctx.rotate(rot);
+
+      ctx.beginPath();
+      ctx.ellipse(0,0,18,14,0,0,Math.PI*2);
+      ctx.fillStyle = '#fbbf24';
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.ellipse(-2,3,10,8,0,0,Math.PI*2);
+      ctx.fillStyle = '#fde68a';
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.ellipse(14,-8,10,9,0,0,Math.PI*2);
+      ctx.fillStyle = '#fbbf24';
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.ellipse(26,-6,8,4,0,0,Math.PI*2);
+      ctx.fillStyle = '#fb923c';
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(16,-10,2.2,0,Math.PI*2);
+      ctx.fillStyle = '#0f172a';
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function resetRound(toMenu=true){
       score = 0;
       scoreEl.textContent = score;
+
       duck.x = 90;
       duck.y = H/2;
       duck.vy = 0;
+
       pipes.length = 0;
       spawnTimer = 0;
-      draw(); // show ready screen
+
+      state = toMenu ? 'menu' : 'play';
+      tipEl.innerHTML = toMenu
+        ? 'Нажми <b>Старт</b>. Во время игры: тап/клик или пробел — прыжок.'
+        : 'Игра идёт! Тап/клик или пробел — прыжок.';
     }
 
     function addPipe(){
       const minTop = 70;
       const maxTop = H - 140 - GAP;
       const topH = Math.floor(minTop + Math.random()*(maxTop - minTop));
-      pipes.push({
-        x: W + 20,
-        topH,
-        passed: false
-      });
+      pipes.push({ x: W + 20, topH, passed: false });
     }
 
     function flap(){
-      if (state === 'ready'){
-        state = 'play';
-        duck.vy = FLAP;
-        return;
-      }
-      if (state === 'over'){
-        resetGame();
-        return;
-      }
-      if (state === 'play'){
-        duck.vy = FLAP;
-      }
+      // прыжок разрешён ТОЛЬКО во время игры
+      if (state !== 'play') return;
+      duck.vy = FLAP;
     }
 
     function hitPipe(p){
-      // duck bbox
       const dx1 = duck.x - duck.r, dx2 = duck.x + duck.r;
       const dy1 = duck.y - duck.r, dy2 = duck.y + duck.r;
-
       const px1 = p.x, px2 = p.x + PIPE_W;
       const topY2 = p.topH;
       const botY1 = p.topH + GAP;
@@ -451,18 +368,23 @@
       const xOverlap = !(dx2 < px1 || dx1 > px2);
       if (!xOverlap) return false;
 
-      // hits top or bottom pipe
-      const hitTop = dy1 < topY2;
-      const hitBot = dy2 > botY1;
-      return hitTop || hitBot;
+      return (dy1 < topY2) || (dy2 > botY1);
+    }
+
+    function gameOver(){
+      if (state !== 'play') return;
+      state = 'over';
+      tipEl.innerHTML = 'Проиграл 😅 Нажми <b>Рестарт</b> или <b>Старт</b>.';
+
+      if (score > best) best = score;
+      total += score;
+      saveMeta();
     }
 
     function update(){
-      // physics
       duck.vy += GRAV;
       duck.y += duck.vy;
 
-      // bounds
       if (duck.y > H - 30){
         duck.y = H - 30;
         gameOver();
@@ -472,48 +394,30 @@
         duck.vy = 0;
       }
 
-      // pipes
       spawnTimer += 1;
       if (spawnTimer > 95){
         spawnTimer = 0;
         addPipe();
       }
 
-      for (let i=0;i<pipes.length;i++){
-        const p = pipes[i];
+      for (const p of pipes){
         p.x -= 2.6;
 
-        // score
         if (!p.passed && p.x + PIPE_W < duck.x){
           p.passed = true;
           score += 1;
           scoreEl.textContent = score;
         }
 
-        // collision
-        if (hitPipe(p)){
-          gameOver();
-        }
+        if (hitPipe(p)) gameOver();
       }
 
-      // remove offscreen
       while (pipes.length && pipes[0].x + PIPE_W < -20){
         pipes.shift();
       }
     }
 
-    function gameOver(){
-      if (state !== 'play') return;
-      state = 'over';
-
-      // update best + total
-      if (score > best) best = score;
-      total += score;
-      saveMeta();
-    }
-
     function drawBackground(){
-      // sky
       ctx.clearRect(0,0,W,H);
       const g = ctx.createLinearGradient(0,0,0,H);
       g.addColorStop(0,'#93c5fd');
@@ -521,7 +425,6 @@
       ctx.fillStyle = g;
       ctx.fillRect(0,0,W,H);
 
-      // simple distant hills
       ctx.fillStyle = 'rgba(255,255,255,.55)';
       ctx.beginPath();
       ctx.moveTo(0,H-90);
@@ -532,52 +435,60 @@
       ctx.closePath();
       ctx.fill();
 
-      // ground
       ctx.fillStyle = 'rgba(15,23,42,.08)';
       ctx.fillRect(0,H-28,W,28);
     }
 
     function drawPipes(){
       for (const p of pipes){
-        // pipes color
         ctx.fillStyle = 'rgba(15,23,42,.18)';
         ctx.strokeStyle = 'rgba(15,23,42,.20)';
         ctx.lineWidth = 2;
 
-        // top pipe
         ctx.fillRect(p.x, 0, PIPE_W, p.topH);
         ctx.strokeRect(p.x, 0, PIPE_W, p.topH);
 
-        // bottom pipe
         const by = p.topH + GAP;
         ctx.fillRect(p.x, by, PIPE_W, H - by - 28);
         ctx.strokeRect(p.x, by, PIPE_W, H - by - 28);
       }
     }
 
-    function drawOverlay(){
-      ctx.fillStyle = 'rgba(255,255,255,.75)';
-      ctx.strokeStyle = 'rgba(15,23,42,.10)';
-      ctx.lineWidth = 2;
+    function draw(){
+      drawBackground();
+      drawPipes();
 
-      // bubble panel
-      const bw = 300, bh = 110;
-      const bx = (W-bw)/2, by = 70;
-      roundRect(bx,by,bw,bh,18,true,true);
+      const rot = Math.max(-0.6, Math.min(0.8, duck.vy * 0.06));
+      drawDuck(duck.x, duck.y, rot);
 
-      ctx.fillStyle = '#0f172a';
-      ctx.font = '900 18px system-ui';
-      ctx.textAlign = 'center';
-      ctx.fillText(state==='ready' ? 'Тапни, чтобы начать' : 'Проиграл :(', W/2, by+42);
+      ctx.fillStyle = 'rgba(15,23,42,.75)';
+      ctx.font = '900 22px system-ui';
+      ctx.textAlign = 'left';
+      ctx.fillText(String(score), 14, 34);
 
-      ctx.fillStyle = '#475569';
-      ctx.font = '800 13px system-ui';
-      ctx.fillText(state==='ready' ? 'Клик / тап / пробел = взмах' : 'Клик/тап/пробел = заново', W/2, by+70);
-
-      if (state==='over'){
+      // menu/over overlay
+      if (state === 'menu'){
+        ctx.fillStyle = 'rgba(255,255,255,.75)';
+        ctx.strokeStyle = 'rgba(15,23,42,.10)';
+        ctx.lineWidth = 2;
+        roundRect((W-300)/2, 78, 300, 86, 18, true, true);
         ctx.fillStyle = '#0f172a';
-        ctx.font = '900 16px system-ui';
-        ctx.fillText(`Очки: ${score}`, W/2, by+95);
+        ctx.font = '900 18px system-ui';
+        ctx.textAlign = 'center';
+        ctx.fillText('Нажми “Старт”', W/2, 118);
+      }
+      if (state === 'over'){
+        ctx.fillStyle = 'rgba(255,255,255,.75)';
+        ctx.strokeStyle = 'rgba(15,23,42,.10)';
+        ctx.lineWidth = 2;
+        roundRect((W-300)/2, 78, 300, 96, 18, true, true);
+        ctx.fillStyle = '#0f172a';
+        ctx.font = '900 18px system-ui';
+        ctx.textAlign = 'center';
+        ctx.fillText('Проиграл', W/2, 116);
+        ctx.fillStyle = '#475569';
+        ctx.font = '900 14px system-ui';
+        ctx.fillText(`Очки: ${score}`, W/2, 144);
       }
     }
 
@@ -593,34 +504,13 @@
       if (stroke) ctx.stroke();
     }
 
-    function draw(){
-      drawBackground();
-      drawPipes();
-
-      // duck rotation based on velocity
-      const rot = Math.max(-0.6, Math.min(0.8, duck.vy * 0.06));
-      drawDuck(duck.x, duck.y, rot);
-
-      // score in canvas corner
-      ctx.fillStyle = 'rgba(15,23,42,.75)';
-      ctx.font = '900 22px system-ui';
-      ctx.textAlign = 'left';
-      ctx.fillText(String(score), 14, 34);
-
-      if (state === 'ready' || state === 'over'){
-        drawOverlay();
-      }
-    }
-
     function loop(){
-      if (state === 'play'){
-        update();
-      }
+      if (state === 'play') update();
       draw();
       requestAnimationFrame(loop);
     }
 
-    // controls
+    // controls: ONLY flaps in play
     cv.addEventListener('pointerdown', (e)=>{ e.preventDefault(); flap(); }, {passive:false});
     window.addEventListener('keydown', (e)=>{
       if (e.code === 'Space'){
@@ -630,46 +520,43 @@
     }, {passive:false});
 
     // buttons
+    document.getElementById('startBtn').addEventListener('click', ()=>{
+      // start from menu or over
+      if (state === 'menu' || state === 'over'){
+        resetRound(false);
+        duck.vy = FLAP;
+      }
+    });
     document.getElementById('restartBtn').addEventListener('click', ()=>{
-      resetGame();
-      state = 'play';
-      duck.vy = FLAP;
+      resetRound(true);
     });
     document.getElementById('resetTotalBtn').addEventListener('click', ()=>{
       total = 0;
       saveMeta();
     });
 
-    // start loop
-    resetGame();
+    resetRound(true);
     requestAnimationFrame(loop);
 
-    // ---------- RUB CONVERTER ----------
+    // ---------- RUB ----------
     const rubPointsInp = document.getElementById('rubPoints');
-    const rateInp = document.getElementById('rate');
+    const rateFixedInp = document.getElementById('rateFixed');
     const rubOut = document.getElementById('rubOut');
 
     function syncRubPoints(){
       rubPointsInp.value = String(total);
-      const savedRate = localStorage.getItem(K_RATE);
-      if (savedRate !== null && rateInp.value === '') rateInp.value = savedRate;
+      rateFixedInp.value = `1 очко = ${RUB_PER_POINT.toFixed(2)} ₽`;
     }
-    document.getElementById('refreshPointsBtn').addEventListener('click', syncRubPoints);
+    syncRubPoints();
 
     document.getElementById('calcBtn').addEventListener('click', ()=>{
-      const rate = Number(rateInp.value);
-      if (!Number.isFinite(rate) || rate < 0){
-        rubOut.className = 'msg bad';
-        rubOut.textContent = 'Введи нормальную цену за 1 очко (например 0.50).';
-        return;
-      }
-      localStorage.setItem(K_RATE, String(rate));
-      const rub = total * rate;
+      syncRubPoints();
+      const rub = total * RUB_PER_POINT;
       rubOut.className = 'msg good';
       rubOut.textContent = `Сумма: ${rub.toFixed(2)} ₽`;
     });
 
-    // ---------- PROMO (hidden code) ----------
+    // ---------- PROMO ----------
     const promoInp = document.getElementById('promo');
     const promoMsg = document.getElementById('promoMsg');
     let promoUses = Number(localStorage.getItem(K_PROMO_USES) || 0);
@@ -683,18 +570,10 @@
 
     document.getElementById('promoBtn').addEventListener('click', ()=>{
       const code = (promoInp.value || '').trim().toLowerCase();
-      if (!code){
-        setPromo('Введи код.', false);
-        return;
-      }
-      if (code !== SECRET_CODE){
-        setPromo('Неверный код.', false);
-        return;
-      }
-      if (promoUses >= PROMO_MAX_USES){
-        setPromo('Лимит активаций исчерпан.', false);
-        return;
-      }
+      if (!code){ setPromo('Введи код.', false); return; }
+      if (code !== SECRET_CODE){ setPromo('Неверный код.', false); return; }
+      if (promoUses >= PROMO_MAX_USES){ setPromo('Лимит активаций исчерпан.', false); return; }
+
       promoUses += 1;
       localStorage.setItem(K_PROMO_USES, String(promoUses));
 
@@ -703,9 +582,6 @@
       promoInp.value = '';
       setPromo('Бонус получен.', true);
     });
-
-    // init rub panel values
-    syncRubPoints();
   </script>
 </body>
 </html>
