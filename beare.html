@@ -2,23 +2,33 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Duck Tap + Flappy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>Duck Clicker</title>
   <style>
     :root{
       --bg1:#7dd3fc; --bg2:#bae6fd;
       --card:#ffffffcc; --text:#0f172a; --muted:#475569;
       --shadow: 0 20px 60px rgba(2, 6, 23, .18);
-      --radius: 22px; --ok:#16a34a; --bad:#ef4444; --warn:#f59e0b;
+      --radius: 22px; --ok:#16a34a; --bad:#ef4444;
     }
     *{box-sizing:border-box}
+    html,body{height:100%}
     body{
-      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color:var(--text); min-height:100vh; display:grid; place-items:center; overflow:hidden;
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      min-height:100svh;
+      display:grid;
+      place-items:center;
+      overflow:hidden;
       background: linear-gradient(180deg, var(--bg1), var(--bg2));
+      padding:
+        max(env(safe-area-inset-top), 10px)
+        max(env(safe-area-inset-right), 10px)
+        max(env(safe-area-inset-bottom), 10px)
+        max(env(safe-area-inset-left), 10px);
     }
 
-    /* clouds */
     .cloud{ position:absolute; width:220px; height:70px; background:#fff; border-radius:999px; opacity:.85;
       box-shadow: 0 14px 40px rgba(2, 6, 23, .08); animation: drift linear infinite; }
     .cloud::before,.cloud::after{ content:""; position:absolute; background:#fff; border-radius:999px; }
@@ -28,8 +38,8 @@
 
     .card{
       position:relative;
-      width:min(720px, 94vw);
-      padding:16px;
+      width:min(560px, 96vw);
+      padding:14px;
       border-radius: var(--radius);
       background: var(--card);
       backdrop-filter: blur(10px);
@@ -37,13 +47,15 @@
       border: 1px solid rgba(255,255,255,.55);
       text-align:center;
     }
-    h1{ margin:6px 0 6px; font-size: clamp(22px, 3.2vw, 32px); }
-    .sub{ margin:0 0 12px; color: var(--muted); font-size: 14px; }
+    h1{ margin:6px 0 4px; font-size: clamp(20px, 3.2vw, 28px); }
+    .sub{ margin:0 0 10px; color: var(--muted); font-size: 13px; }
 
-    .hud{
-      width:min(520px, 92vw);
-      margin: 0 auto 10px;
-      display:flex; justify-content:center; gap:10px; flex-wrap:wrap;
+    .topbar{
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin: 8px 0 10px;
     }
     .pill{
       display:inline-flex; align-items:center; gap:8px;
@@ -55,13 +67,12 @@
     }
     .pill small{ font-weight:900; color: var(--muted); }
 
-    /* tap duck */
     .duck-wrap{
       position:relative;
       display:grid;
       place-items:center;
-      margin: 8px auto 6px;
-      width:min(340px, 72vw);
+      margin: 6px auto 6px;
+      width:min(320px, 74vw);
       aspect-ratio: 1 / 1;
     }
     .duck-btn{
@@ -75,7 +86,7 @@
     .duck-btn:active{ transform: scale(.98); }
     .duck{
       width: 86%;
-      max-width: 320px;
+      max-width: 300px;
       filter: drop-shadow(0 18px 28px rgba(2,6,23,.22));
       transform-origin: 50% 70%;
     }
@@ -96,13 +107,12 @@
       from{ transform: translateY(0) scale(.9); opacity: 1; }
       to{ transform: translateY(-90px) scale(1.35); opacity: 0; }
     }
+    .hint{ margin-top:8px; font-size: 12px; color: var(--muted); }
 
-    .hint{ margin-top:10px; font-size: 13px; color: var(--muted); }
-
-    /* floating flappy button */
+    /* floating buttons */
     .float{
       position:fixed;
-      right: 16px;
+      right: max(env(safe-area-inset-right), 12px);
       top: 50%;
       transform: translateY(-50%);
       z-index: 50;
@@ -130,21 +140,30 @@
       background: rgba(2,6,23,.45);
       display:none;
       align-items:center; justify-content:center;
-      padding: 16px;
+      padding: max(env(safe-area-inset-top), 10px) 10px max(env(safe-area-inset-bottom), 10px);
     }
     .modal-back.show{ display:flex; }
     .modal{
       width:min(620px, 96vw);
-      background: rgba(255,255,255,.92);
+      background: rgba(255,255,255,.94);
       border: 1px solid rgba(15,23,42,.10);
       border-radius: 22px;
       box-shadow: 0 22px 70px rgba(2,6,23,.28);
-      padding: 14px;
+      padding: 12px;
       text-align:center;
+      max-height: 92svh;
+      overflow:auto;
     }
-    .modal h2{ margin:6px 0 6px; font-size: 20px; }
-    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; justify-content:center; margin-top: 10px; }
-    label{ display:block; font-weight: 1000; color: var(--muted); font-size: 12px; margin-bottom:6px; text-align:left; }
+    .modal h2{ margin:6px 0 6px; font-size: 18px; }
+    .row{
+      display:flex; gap:10px; flex-wrap:wrap;
+      align-items:flex-end; justify-content:center;
+      margin-top: 10px;
+    }
+    label{
+      display:block; font-weight: 1000; color: var(--muted);
+      font-size: 12px; margin-bottom:6px; text-align:left;
+    }
     input{
       width: 220px;
       padding: 10px 12px;
@@ -155,12 +174,13 @@
       background: rgba(255,255,255,.95);
     }
     .btn{
-      border:none; cursor:pointer; border-radius: 14px; padding: 10px 14px; font-weight: 1000;
+      border:none; cursor:pointer; border-radius: 14px;
+      padding: 10px 14px; font-weight: 1000;
       background: rgba(15, 23, 42, .92); color:#fff;
       box-shadow: 0 12px 30px rgba(2,6,23,.18);
     }
     .btn.secondary{
-      background: rgba(255,255,255,.85); color: var(--text);
+      background: rgba(255,255,255,.90); color: var(--text);
       border: 1px solid rgba(15, 23, 42, .10);
     }
     .msg{ margin-top:10px; font-weight: 1000; font-size: 13px; color: var(--muted); }
@@ -169,10 +189,10 @@
 
     /* flappy canvas */
     canvas{
-      width:min(420px, 92vw);
-      height:auto;
+      width: min(420px, 92vw);
+      height: auto;
       border-radius: 18px;
-      background: rgba(255,255,255,.65);
+      background: rgba(255,255,255,.70);
       border: 1px solid rgba(15, 23, 42, .10);
       box-shadow: 0 12px 30px rgba(2,6,23,.12);
       touch-action: manipulation;
@@ -193,40 +213,59 @@
   <div class="cloud" style="top:26vh; left:-420px; animation-duration: 48s; transform: scale(1.1); opacity:.8;"></div>
 
   <div class="card">
-    <h1>Уточка-таpалка 🦆</h1>
-    <div class="sub">Тапай утку — копи очки. Flappy открывается шариком справа.</div>
+    <h1>Кликер уточки 🦆</h1>
+    <div class="sub">Нажимай на утку — получай очки. Справа круг: Flappy со ставкой.</div>
 
-    <div class="hud">
+    <div class="topbar">
       <div class="pill">⭐ <span id="balance">0</span> <small>очки</small></div>
-      <div class="pill">💥 <span id="taps">0</span> <small>тапов</small></div>
+      <div class="pill">💥 <span id="taps">0</span> <small>клики</small></div>
     </div>
 
     <div class="duck-wrap" id="arena">
-      <button class="duck-btn" id="duckBtn" aria-label="Тап по уточке">
-        <img
-          id="duckImg"
-          class="duck"
-          alt="Уточка"
-          src="https://commons.wikimedia.org/wiki/Special:FilePath/Rubber%20duck.svg"
-        />
+      <button class="duck-btn" id="duckBtn" aria-label="Клик по уточке">
+        <img id="duckImg" class="duck" alt="Уточка"
+             src="https://commons.wikimedia.org/wiki/Special:FilePath/Rubber%20duck.svg"/>
       </button>
     </div>
 
-    <div class="hint">Очки сохраняются в браузере. Flappy — ставка/испытание на 40 пролётов.</div>
+    <div class="hint">Перевод в рубли (0.01 ₽ за 1 очко) — кнопка ₽ справа.</div>
   </div>
 
-  <!-- floating side button -->
   <div class="float">
+    <button class="fab" id="openRub" type="button">₽<span>Рубли</span></button>
     <button class="fab" id="openFlappy" type="button">🎮<span>Flappy</span></button>
   </div>
 
-  <!-- modal -->
-  <div class="modal-back" id="modalBack">
+  <!-- RUB modal -->
+  <div class="modal-back" id="rubBack">
+    <div class="modal">
+      <h2>Перевод в рубли</h2>
+      <div class="msg">Курс фиксированный: <b>1 очко = 0.01 ₽</b></div>
+
+      <div class="row">
+        <div>
+          <label>Твои очки</label>
+          <input id="rubPoints" type="text" readonly/>
+        </div>
+        <div>
+          <label>Сумма ₽</label>
+          <input id="rubSum" type="text" readonly/>
+        </div>
+      </div>
+
+      <div class="row">
+        <button class="btn" id="calcRub" type="button">Посчитать</button>
+        <button class="btn secondary" id="closeRub" type="button">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLAPPY modal -->
+  <div class="modal-back" id="flBack">
     <div class="modal">
       <h2>Flappy Duck — ставка</h2>
       <div class="msg" id="flInfo">
-        Правила: делай ставку очками. Пройди <b>40</b> столбов → получишь <b>x2</b>.
-        Проиграл → ставка сгорает.
+        Ставишь очки → играешь. Пройди <b>40</b> столбов → получишь <b>x2</b>. Проиграл → ставка сгорает.
       </div>
 
       <div class="row">
@@ -255,9 +294,10 @@
   </div>
 
 <script>
-  // ---------- TAP GAME ----------
+  // ---------- CLICKER ----------
   const K_BAL = 'duck_balance';
   const K_TAPS = 'duck_taps';
+  const RUB_PER_POINT = 0.01;
 
   let balance = Number(localStorage.getItem(K_BAL) || 0);
   let taps = Number(localStorage.getItem(K_TAPS) || 0);
@@ -295,7 +335,7 @@
 
   duckBtn.addEventListener('click', (e)=>{
     taps += 1;
-    balance += 1; // 1 тап = 1 очко
+    balance += 1;
     saveTap();
     renderTap();
     popDuck();
@@ -304,8 +344,29 @@
 
   renderTap();
 
+  // ---------- RUB MODAL ----------
+  const rubBack = document.getElementById('rubBack');
+  const openRub = document.getElementById('openRub');
+  const closeRub = document.getElementById('closeRub');
+  const calcRub = document.getElementById('calcRub');
+  const rubPoints = document.getElementById('rubPoints');
+  const rubSum = document.getElementById('rubSum');
+
+  function updateRub(){
+    rubPoints.value = String(balance);
+    rubSum.value = (balance * RUB_PER_POINT).toFixed(2) + ' ₽';
+  }
+
+  openRub.addEventListener('click', ()=>{
+    updateRub();
+    rubBack.classList.add('show');
+  });
+  closeRub.addEventListener('click', ()=> rubBack.classList.remove('show'));
+  rubBack.addEventListener('click', (e)=>{ if (e.target === rubBack) rubBack.classList.remove('show'); });
+  calcRub.addEventListener('click', updateRub);
+
   // ---------- FLAPPY MODAL ----------
-  const modalBack = document.getElementById('modalBack');
+  const flBack = document.getElementById('flBack');
   const openFlappy = document.getElementById('openFlappy');
   const closeFlappy = document.getElementById('closeFlappy');
   const startFlappyBtn = document.getElementById('startFlappy');
@@ -317,40 +378,40 @@
   const restartBtn = document.getElementById('restartBtn');
 
   openFlappy.addEventListener('click', ()=>{
-    modalBack.classList.add('show');
+    flBack.classList.add('show');
     syncUI();
-    draw(); // show screen
+    draw();
   });
-  closeFlappy.addEventListener('click', ()=> modalBack.classList.remove('show'));
-  modalBack.addEventListener('click', (e)=>{
-    if (e.target === modalBack) modalBack.classList.remove('show');
-  });
+  closeFlappy.addEventListener('click', ()=> flBack.classList.remove('show'));
+  flBack.addEventListener('click', (e)=>{ if (e.target === flBack) flBack.classList.remove('show'); });
 
-  // ---------- FLAPPY GAME ----------
+  // ---------- FLAPPY GAME (чуть легче) ----------
   const cv = document.getElementById('cv');
   const ctx = cv.getContext('2d');
   const W = cv.width, H = cv.height;
 
   const TARGET = 40;
 
+  // легче:
+  const GRAV = 0.40;      // меньше гравитация
+  const FLAP = -7.8;      // сильнее прыжок
+  const SPEED = 2.35;     // медленнее трубы
+  const GAP = 175;        // шире дырка
+  const PIPE_W = 64;
+
   let state = 'idle'; // idle, play, over, win
   let stake = 0;
   let score = 0;
 
   const duck = { x: 90, y: H/2, vy: 0, r: 16 };
-  const GRAV = 0.45;
-  const FLAP = -7.3;
-
   const pipes = [];
-  const PIPE_W = 64;
-  const GAP = 150;
   let spawnTimer = 0;
+  const SPAWN_EVERY = 105; // реже спавн
 
   function setMsg(text, kind){
     flMsg.className = 'msg ' + (kind || '');
     flMsg.innerHTML = text || '';
   }
-
   function syncUI(){
     stakeNowEl.textContent = stake;
     scoreEl.textContent = score;
@@ -358,9 +419,8 @@
       state==='idle' ? 'не играем' :
       state==='play' ? 'игра' :
       state==='win' ? 'победа' : 'проиграл';
-    renderTap(); // обновляем баланс сверху (вдруг изменился)
+    renderTap();
   }
-
   function resetRound(toIdle=true){
     score = 0;
     duck.x = 90; duck.y = H/2; duck.vy = 0;
@@ -370,19 +430,16 @@
     setMsg('', '');
     syncUI();
   }
-
   function addPipe(){
     const minTop = 70;
     const maxTop = H - 140 - GAP;
     const topH = Math.floor(minTop + Math.random()*(maxTop - minTop));
     pipes.push({ x: W + 20, topH, passed: false });
   }
-
   function flap(){
     if (state !== 'play') return;
     duck.vy = FLAP;
   }
-
   function hitPipe(p){
     const dx1 = duck.x - duck.r, dx2 = duck.x + duck.r;
     const dy1 = duck.y - duck.r, dy2 = duck.y + duck.r;
@@ -394,62 +451,44 @@
     if (!xOverlap) return false;
     return (dy1 < topY2) || (dy2 > botY1);
   }
-
   function win(){
     if (state !== 'play') return;
     state = 'win';
-    // ставка уже списана при старте. Победа => возвращаем 2x, значит +2*stake
-    balance += (stake * 2);
+    balance += (stake * 2); // x2
     saveTap();
-    setMsg(`✅ Победа! Ты прошёл <b>${TARGET}</b>. Выигрыш: <b>${stake} × 2</b>.`, 'good');
+    setMsg(`✅ Победа! Выигрыш: <b>${stake} × 2</b>.`, 'good');
     syncUI();
   }
-
   function gameOver(){
     if (state !== 'play') return;
     state = 'over';
     setMsg(`❌ Проиграл. Ставка <b>${stake}</b> сгорела.`, 'bad');
     syncUI();
   }
-
   function update(){
     duck.vy += GRAV;
     duck.y += duck.vy;
 
-    if (duck.y > H - 30){
-      duck.y = H - 30;
-      gameOver();
-    }
-    if (duck.y < 10){
-      duck.y = 10;
-      duck.vy = 0;
-    }
+    if (duck.y > H - 30){ duck.y = H - 30; gameOver(); }
+    if (duck.y < 10){ duck.y = 10; duck.vy = 0; }
 
     spawnTimer += 1;
-    if (spawnTimer > 95){
+    if (spawnTimer > SPAWN_EVERY){
       spawnTimer = 0;
       addPipe();
     }
 
     for (const p of pipes){
-      p.x -= 2.6;
+      p.x -= SPEED;
 
       if (!p.passed && p.x + PIPE_W < duck.x){
         p.passed = true;
         score += 1;
-        if (score >= TARGET){
-          win();
-        }
+        if (score >= TARGET) win();
       }
-
-      if (hitPipe(p)){
-        gameOver();
-      }
+      if (hitPipe(p)) gameOver();
     }
-
-    while (pipes.length && pipes[0].x + PIPE_W < -20){
-      pipes.shift();
-    }
+    while (pipes.length && pipes[0].x + PIPE_W < -20) pipes.shift();
   }
 
   function drawDuck(x,y,rot){
@@ -474,7 +513,17 @@
 
     ctx.restore();
   }
-
+  function roundRect(x,y,w,h,r,fill,stroke){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+    if (fill) ctx.fill();
+    if (stroke) ctx.stroke();
+  }
   function drawBackground(){
     ctx.clearRect(0,0,W,H);
     const g = ctx.createLinearGradient(0,0,0,H);
@@ -489,13 +538,11 @@
     ctx.quadraticCurveTo(W*0.25,H-140,W*0.5,H-105);
     ctx.quadraticCurveTo(W*0.75,H-70,W,H-115);
     ctx.lineTo(W,H); ctx.lineTo(0,H);
-    ctx.closePath();
-    ctx.fill();
+    ctx.closePath(); ctx.fill();
 
     ctx.fillStyle = 'rgba(15,23,42,.08)';
     ctx.fillRect(0,H-28,W,28);
   }
-
   function drawPipes(){
     for (const p of pipes){
       ctx.fillStyle = 'rgba(15,23,42,.18)';
@@ -510,13 +557,12 @@
       ctx.strokeRect(p.x, by, PIPE_W, H - by - 28);
     }
   }
-
   function drawOverlay(text){
-    ctx.fillStyle = 'rgba(255,255,255,.78)';
+    ctx.fillStyle = 'rgba(255,255,255,.80)';
     ctx.strokeStyle = 'rgba(15,23,42,.10)';
     ctx.lineWidth = 2;
-    const bw = 300, bh = 96;
-    const bx = (W-bw)/2, by = 78;
+    const bw = 310, bh = 90;
+    const bx = (W-bw)/2, by = 82;
     roundRect(bx,by,bw,bh,18,true,true);
 
     ctx.fillStyle = '#0f172a';
@@ -526,76 +572,41 @@
 
     ctx.fillStyle = '#475569';
     ctx.font = '900 13px system-ui';
-    ctx.fillText('Тап/клик/пробел — прыжок (только в игре)', W/2, by+66);
+    ctx.fillText('Тап/клик/пробел — прыжок', W/2, by+64);
   }
-
-  function roundRect(x,y,w,h,r,fill,stroke){
-    ctx.beginPath();
-    ctx.moveTo(x+r,y);
-    ctx.arcTo(x+w,y,x+w,y+h,r);
-    ctx.arcTo(x+w,y+h,x,y+h,r);
-    ctx.arcTo(x,y+h,x,y,r);
-    ctx.arcTo(x,y,x+w,y,r);
-    ctx.closePath();
-    if (fill) ctx.fill();
-    if (stroke) ctx.stroke();
-  }
-
   function draw(){
     drawBackground();
     drawPipes();
+
     const rot = Math.max(-0.6, Math.min(0.8, duck.vy * 0.06));
     drawDuck(duck.x, duck.y, rot);
 
-    // score top-left
     ctx.fillStyle = 'rgba(15,23,42,.75)';
     ctx.font = '1000 22px system-ui';
     ctx.textAlign = 'left';
     ctx.fillText(String(score), 14, 34);
 
-    if (state === 'idle'){
-      drawOverlay('Введи ставку и нажми “Играть”');
-    } else if (state === 'over'){
-      drawOverlay('Проиграл. Нажми “Рестарт”');
-    } else if (state === 'win'){
-      drawOverlay('Победа! Нажми “Рестарт”');
-    }
+    if (state === 'idle') drawOverlay('Введи ставку и нажми “Играть”');
+    if (state === 'over') drawOverlay('Проиграл. Нажми “Рестарт”');
+    if (state === 'win') drawOverlay('Победа! Нажми “Рестарт”');
   }
-
   function loop(){
-    if (state === 'play'){
-      update();
-    }
+    if (state === 'play') update();
     draw();
     requestAnimationFrame(loop);
   }
 
-  // controls
   cv.addEventListener('pointerdown', (e)=>{ e.preventDefault(); flap(); }, {passive:false});
   window.addEventListener('keydown', (e)=>{
-    if (e.code === 'Space'){
-      e.preventDefault();
-      flap();
-    }
+    if (e.code === 'Space'){ e.preventDefault(); flap(); }
   }, {passive:false});
 
   startFlappyBtn.addEventListener('click', ()=>{
     const s = Math.floor(Number(stakeInp.value));
-    if (!Number.isFinite(s) || s <= 0){
-      setMsg('Введите нормальную ставку (целое число > 0).', 'bad');
-      return;
-    }
-    if (balance < s){
-      setMsg('Не хватает очков на ставку.', 'bad');
-      return;
-    }
+    if (!Number.isFinite(s) || s <= 0){ setMsg('Введите ставку (>0).', 'bad'); return; }
+    if (balance < s){ setMsg('Не хватает очков на ставку.', 'bad'); return; }
 
-    // списываем ставку сразу
-    balance -= s;
-    taps += 0; // не трогаем
-    saveTap();
-    renderTap();
-
+    balance -= s; saveTap(); renderTap();
     stake = s;
     resetRound(false);
     duck.vy = FLAP;
@@ -603,11 +614,8 @@
     syncUI();
   });
 
-  restartBtn.addEventListener('click', ()=>{
-    resetRound(true);
-  });
+  restartBtn.addEventListener('click', ()=> resetRound(true));
 
-  // init
   resetRound(true);
   requestAnimationFrame(loop);
 </script>
