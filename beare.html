@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Уточка</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f8ff;
+        }
+        #duck {
+            width: 200px;
+            height: 200px;
+            background-image: url('https://i.imgur.com/3YndcZe.png'); /* Ссылка на изображение утки */
+            background-size: cover;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="duck" onclick="clickDuck()"></div>
+    <script>
+        function clickDuck() {
+            alert("Ты нажал на уточку! 🦆");
+        }
+    </script>
+</body>
+</html>
