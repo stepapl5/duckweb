@@ -9,7 +9,7 @@
       --bg1:#7dd3fc; --bg2:#bae6fd;
       --card:#ffffffcc; --text:#0f172a; --muted:#475569;
       --shadow: 0 20px 60px rgba(2, 6, 23, .18);
-      --radius: 22px; --ok:#16a34a; --bad:#ef4444;
+      --radius: 22px; --ok:#16a34a; --bad:#ef4444; --warn:#f59e0b;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -64,8 +64,42 @@
       border: 1px solid rgba(15, 23, 42, .08);
       box-shadow: 0 10px 24px rgba(2,6,23,.08);
       font-weight: 900;
+      white-space: nowrap;
     }
     .pill small{ font-weight:900; color: var(--muted); }
+
+    /* energy bar */
+    .energyBox{
+      width:min(520px, 92vw);
+      margin: 4px auto 10px;
+      text-align:left;
+    }
+    .energyTop{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      color: var(--muted);
+      font-weight: 1000;
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+    .bar{
+      width:100%;
+      height:14px;
+      border-radius:999px;
+      background: rgba(15, 23, 42, .10);
+      overflow:hidden;
+      border: 1px solid rgba(15, 23, 42, .08);
+    }
+    .bar > div{
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      transition: width .18s ease;
+      background: var(--ok);
+    }
+    .energyHint{ margin-top:6px; font-size:12px; color: var(--muted); font-weight:900; }
 
     .duck-wrap{
       position:relative;
@@ -84,12 +118,16 @@
       transition: transform .08s ease;
     }
     .duck-btn:active{ transform: scale(.98); }
+    .duck-btn:disabled{ opacity:.60; cursor:not-allowed; }
     .duck{
       width: 86%;
       max-width: 300px;
       filter: drop-shadow(0 18px 28px rgba(2,6,23,.22));
       transform-origin: 50% 70%;
     }
+    .duck.red{ filter: drop-shadow(0 18px 28px rgba(2,6,23,.22)) hue-rotate(150deg) saturate(2.4); }
+    .duck.green{ filter: drop-shadow(0 18px 28px rgba(2,6,23,.22)) hue-rotate(80deg) saturate(2.2); }
+
     .pop{ animation: pop .22s ease-out; }
     @keyframes pop{
       0%{ transform: translateY(0) rotate(0deg) scale(1); }
@@ -182,6 +220,7 @@
       background: rgba(255,255,255,.90); color: var(--text);
       border: 1px solid rgba(15, 23, 42, .10);
     }
+    .btn:disabled{ opacity:.55; cursor:not-allowed; }
     .msg{ margin-top:10px; font-weight: 1000; font-size: 13px; color: var(--muted); }
     .msg.good{ color: var(--ok); }
     .msg.bad{ color: var(--bad); }
@@ -203,6 +242,30 @@
       width:min(420px, 92vw); margin: 8px auto 0;
       color: var(--muted); font-weight:1000; font-size: 13px;
     }
+
+    .shopCard{
+      width:min(520px, 92vw);
+      margin: 10px auto 0;
+      background: rgba(255,255,255,.70);
+      border: 1px solid rgba(15,23,42,.10);
+      border-radius: 18px;
+      padding: 12px;
+      text-align:left;
+      box-shadow: 0 10px 24px rgba(2,6,23,.10);
+    }
+    .shopTitle{ font-weight:1000; margin:0 0 8px; }
+    .skinRow{
+      display:flex; gap:10px; align-items:center; justify-content:space-between;
+      flex-wrap:wrap;
+      padding: 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(15,23,42,.08);
+      background: rgba(255,255,255,.75);
+      margin-top: 8px;
+    }
+    .skinLeft{ display:flex; flex-direction:column; gap:2px; }
+    .skinName{ font-weight:1000; }
+    .skinDesc{ font-size:12px; color: var(--muted); font-weight:900; }
   </style>
 </head>
 
@@ -213,11 +276,22 @@
 
   <div class="card">
     <h1>Кликер уточки 🦆</h1>
-    <div class="sub">Кликай по утке → очки. Справа: ₽ (перевод) и Flappy (ставка).</div>
+    <div class="sub">Кликай по утке → очки. Энергия тратится и восстанавливается.</div>
 
     <div class="topbar">
       <div class="pill">⭐ <span id="balance">0</span> <small>очки</small></div>
       <div class="pill">💥 <span id="taps">0</span> <small>клики</small></div>
+      <div class="pill">✨ <span id="stars">0</span> <small>звёзды</small></div>
+      <div class="pill">🎨 <span id="skinLabel">Обычная</span></div>
+    </div>
+
+    <div class="energyBox">
+      <div class="energyTop">
+        <div>⚡ Энергия: <span id="energyText">0</span>/<span id="energyMaxText">0</span></div>
+        <div>−<span id="costText">1</span> / клик · +<span id="regenText">1</span> / <span id="regenSecText">2</span>с</div>
+      </div>
+      <div class="bar"><div id="energyBar"></div></div>
+      <div class="energyHint" id="energyHint">Жми на утку 🙂</div>
     </div>
 
     <div class="duck-wrap" id="arena">
@@ -227,16 +301,17 @@
       </button>
     </div>
 
-    <div class="hint">Перевод: 1 очко = 0.01 ₽. В Flappy нужно пройти 40.</div>
+    <div class="hint">Справа: ₽ (перевод), 🎮 Flappy (ставка), 🎨 Скины.</div>
   </div>
 
   <!-- FLOAT BUTTONS -->
   <div class="float">
     <button class="fab" id="openRub" type="button">₽<span>Рубли</span></button>
     <button class="fab" id="openFlappy" type="button">🎮<span>Flappy</span></button>
+    <button class="fab" id="openSkins" type="button">🎨<span>Скины</span></button>
   </div>
 
-  <!-- RUB MODAL (ПЕРЕВОД В РУБЛИ) -->
+  <!-- RUB MODAL -->
   <div class="modal-back" id="rubBack">
     <div class="modal">
       <h2>Перевод в рубли</h2>
@@ -260,11 +335,58 @@
     </div>
   </div>
 
+  <!-- SKINS MODAL -->
+  <div class="modal-back" id="skinsBack">
+    <div class="modal">
+      <h2>Скины (за ⭐)</h2>
+      <div class="msg">Красная/Зелёная меняют множители кликов и Flappy.</div>
+
+      <div class="shopCard">
+        <div class="shopTitle">Доступные скины</div>
+
+        <div class="skinRow">
+          <div class="skinLeft">
+            <div class="skinName">🔴 Красная</div>
+            <div class="skinDesc">Кликер: x2 · Flappy: x2.5 · Цена: 40⭐</div>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn secondary" id="equipRed" type="button">Надеть</button>
+            <button class="btn" id="buyRed" type="button">Купить 40⭐</button>
+          </div>
+        </div>
+
+        <div class="skinRow">
+          <div class="skinLeft">
+            <div class="skinName">🟢 Зелёная</div>
+            <div class="skinDesc">Кликер: x3 · Flappy: x3 · Цена: 100⭐</div>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn secondary" id="equipGreen" type="button">Надеть</button>
+            <button class="btn" id="buyGreen" type="button">Купить 100⭐</button>
+          </div>
+        </div>
+
+        <div class="row" style="justify-content:space-between; align-items:center;">
+          <div class="pill">✨ <span id="stars2">0</span> <small>звёзды</small></div>
+          <button class="btn secondary" id="howBuyStars" type="button">Как купить ⭐</button>
+        </div>
+
+        <div class="msg" id="skinsMsg"></div>
+      </div>
+
+      <div class="row">
+        <button class="btn secondary" id="closeSkins" type="button">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
   <!-- FLAPPY MODAL -->
   <div class="modal-back" id="flBack">
     <div class="modal">
       <h2>Flappy Duck — ставка</h2>
-      <div class="msg">Ставка очками. Пройди <b>40</b> → получишь <b>x2</b>. Проиграл → ставка сгорает.</div>
+      <div class="msg" id="flInfo">
+        Ставка очками. Пройди <b>40</b> → получишь выигрыш = ставка × множитель скина.
+      </div>
 
       <div class="row">
         <div>
@@ -280,6 +402,7 @@
       <div class="flhud">
         <div>Счёт: <span id="score">0</span>/40</div>
         <div>Ставка: <span id="stakeNow">0</span></div>
+        <div>Множитель: <span id="flMultLabel">x2</span></div>
         <div>Статус: <span id="status">не играем</span></div>
       </div>
 
@@ -292,33 +415,151 @@
   </div>
 
 <script>
-  // ---------- CLICKER ----------
+  // ---------- STORAGE ----------
   const K_BAL = 'duck_balance';
   const K_TAPS = 'duck_taps';
+  const K_STARS = 'duck_stars';
+  const K_SKIN = 'duck_skin';
+  const K_OWN_RED = 'duck_own_red';
+  const K_OWN_GREEN = 'duck_own_green';
+  const K_EN = 'duck_energy';
+
   const RUB_PER_POINT = 0.01;
 
+  // energy
+  const ENERGY_MAX = 100;
+  const CLICK_COST = 1;
+  const REGEN_AMOUNT = 1;
+  const REGEN_EVERY_MS = 2000;
+
+  // skins
+  const SKINS = {
+    normal: { label: 'Обычная', tapMult: 1, flappyMult: 2.0, css: '' },
+    red:    { label: 'Красная', tapMult: 2, flappyMult: 2.5, css: 'red' },
+    green:  { label: 'Зелёная', tapMult: 3, flappyMult: 3.0, css: 'green' }
+  };
+  const PRICE_RED = 40;
+  const PRICE_GREEN = 100;
+
+  // ---------- STATE ----------
   let balance = Number(localStorage.getItem(K_BAL) || 0);
   let taps = Number(localStorage.getItem(K_TAPS) || 0);
+  let stars = Number(localStorage.getItem(K_STARS) || 0);
 
+  let ownRed = (localStorage.getItem(K_OWN_RED) === '1');
+  let ownGreen = (localStorage.getItem(K_OWN_GREEN) === '1');
+
+  let skinKey = localStorage.getItem(K_SKIN) || 'normal';
+  if (!SKINS[skinKey]) skinKey = 'normal';
+
+  let energy = Number(localStorage.getItem(K_EN));
+  if (!Number.isFinite(energy)) energy = ENERGY_MAX;
+
+  // ---------- ELEMENTS ----------
   const balanceEl = document.getElementById('balance');
   const tapsEl = document.getElementById('taps');
+  const starsEl = document.getElementById('stars');
+  const stars2El = document.getElementById('stars2');
+  const skinLabelEl = document.getElementById('skinLabel');
+
   const duckBtn = document.getElementById('duckBtn');
   const duckImg = document.getElementById('duckImg');
   const arena = document.getElementById('arena');
 
-  function saveTap(){
+  const energyText = document.getElementById('energyText');
+  const energyMaxText = document.getElementById('energyMaxText');
+  const costText = document.getElementById('costText');
+  const regenText = document.getElementById('regenText');
+  const regenSecText = document.getElementById('regenSecText');
+  const energyBar = document.getElementById('energyBar');
+  const energyHint = document.getElementById('energyHint');
+
+  // rub
+  const rubBack = document.getElementById('rubBack');
+  const openRub = document.getElementById('openRub');
+  const closeRub = document.getElementById('closeRub');
+  const calcRub = document.getElementById('calcRub');
+  const rubPoints = document.getElementById('rubPoints');
+  const rubSum = document.getElementById('rubSum');
+
+  // skins modal
+  const skinsBack = document.getElementById('skinsBack');
+  const openSkins = document.getElementById('openSkins');
+  const closeSkins = document.getElementById('closeSkins');
+  const buyRed = document.getElementById('buyRed');
+  const buyGreen = document.getElementById('buyGreen');
+  const equipRed = document.getElementById('equipRed');
+  const equipGreen = document.getElementById('equipGreen');
+  const howBuyStars = document.getElementById('howBuyStars');
+  const skinsMsg = document.getElementById('skinsMsg');
+
+  // flappy
+  const flBack = document.getElementById('flBack');
+  const openFlappy = document.getElementById('openFlappy');
+  const closeFlappy = document.getElementById('closeFlappy');
+  const startFlappyBtn = document.getElementById('startFlappy');
+  const stakeInp = document.getElementById('stakeInp');
+  const stakeNowEl = document.getElementById('stakeNow');
+  const scoreEl = document.getElementById('score');
+  const statusEl = document.getElementById('status');
+  const flMsg = document.getElementById('flMsg');
+  const restartBtn = document.getElementById('restartBtn');
+  const flMultLabel = document.getElementById('flMultLabel');
+
+  // ---------- HELPERS ----------
+  function clamp(n,a,b){ return Math.max(a, Math.min(b, n)); }
+
+  function saveAll(){
     localStorage.setItem(K_BAL, String(balance));
     localStorage.setItem(K_TAPS, String(taps));
+    localStorage.setItem(K_STARS, String(stars));
+    localStorage.setItem(K_SKIN, String(skinKey));
+    localStorage.setItem(K_OWN_RED, ownRed ? '1' : '0');
+    localStorage.setItem(K_OWN_GREEN, ownGreen ? '1' : '0');
+    localStorage.setItem(K_EN, String(energy));
   }
-  function renderTap(){
+
+  function currentSkin(){ return SKINS[skinKey] || SKINS.normal; }
+
+  function renderTop(){
     balanceEl.textContent = balance;
     tapsEl.textContent = taps;
+    starsEl.textContent = stars;
+    stars2El.textContent = stars;
+    skinLabelEl.textContent = currentSkin().label;
+
+    // duck skin style
+    duckImg.classList.remove('red','green');
+    if (currentSkin().css) duckImg.classList.add(currentSkin().css);
   }
+
+  function setEnergyBar(){
+    energy = clamp(energy, 0, ENERGY_MAX);
+    const pct = (energy / ENERGY_MAX) * 100;
+    energyBar.style.width = pct + '%';
+    if (pct > 55) energyBar.style.background = 'var(--ok)';
+    else if (pct > 20) energyBar.style.background = 'var(--warn)';
+    else energyBar.style.background = 'var(--bad)';
+
+    duckBtn.disabled = (energy < CLICK_COST);
+    energyHint.textContent = (energy < CLICK_COST) ? 'Энергия кончилась 😴 Подожди.' : 'Жми на утку 🙂';
+  }
+
+  function renderEnergy(){
+    energyText.textContent = energy;
+    energyMaxText.textContent = ENERGY_MAX;
+    costText.textContent = CLICK_COST;
+    regenText.textContent = REGEN_AMOUNT;
+    regenSecText.textContent = Math.round(REGEN_EVERY_MS/1000);
+    setEnergyBar();
+  }
+
   function popDuck(){
     duckImg.classList.remove('pop');
     void duckImg.offsetWidth;
     duckImg.classList.add('pop');
   }
+
   function bubble(clientX, clientY){
     const b = document.createElement('div');
     b.className = 'bubble';
@@ -331,25 +572,31 @@
     setTimeout(()=> b.remove(), 900);
   }
 
+  // ---------- CLICKER ----------
   duckBtn.addEventListener('click', (e)=>{
+    if (energy < CLICK_COST) return;
+
+    energy -= CLICK_COST;
+
     taps += 1;
-    balance += 1;
-    saveTap();
-    renderTap();
+    balance += currentSkin().tapMult; // множитель скина
+    saveAll();
+    renderTop();
+    renderEnergy();
     popDuck();
     bubble(e.clientX, e.clientY);
   }, {passive:true});
 
-  renderTap();
+  // regen
+  setInterval(()=>{
+    if (energy < ENERGY_MAX){
+      energy = clamp(energy + REGEN_AMOUNT, 0, ENERGY_MAX);
+      saveAll();
+      renderEnergy();
+    }
+  }, REGEN_EVERY_MS);
 
-  // ---------- RUB MODAL (ПЕРЕВОД) ----------
-  const rubBack = document.getElementById('rubBack');
-  const openRub = document.getElementById('openRub');
-  const closeRub = document.getElementById('closeRub');
-  const calcRub = document.getElementById('calcRub');
-  const rubPoints = document.getElementById('rubPoints');
-  const rubSum = document.getElementById('rubSum');
-
+  // ---------- RUB MODAL ----------
   function updateRub(){
     rubPoints.value = String(balance);
     rubSum.value = (balance * RUB_PER_POINT).toFixed(2) + ' ₽';
@@ -359,36 +606,94 @@
   rubBack.addEventListener('click', (e)=>{ if (e.target === rubBack) rubBack.classList.remove('show'); });
   calcRub.addEventListener('click', updateRub);
 
-  // ---------- FLAPPY MODAL ----------
-  const flBack = document.getElementById('flBack');
-  const openFlappy = document.getElementById('openFlappy');
-  const closeFlappy = document.getElementById('closeFlappy');
-  const startFlappyBtn = document.getElementById('startFlappy');
-  const stakeInp = document.getElementById('stakeInp');
-  const stakeNowEl = document.getElementById('stakeNow');
-  const scoreEl = document.getElementById('score');
-  const statusEl = document.getElementById('status');
-  const flMsg = document.getElementById('flMsg');
-  const restartBtn = document.getElementById('restartBtn');
+  // ---------- SKINS MODAL ----------
+  function setSkinsMsg(text, ok){
+    skinsMsg.className = 'msg ' + (ok ? 'good' : (ok===false ? 'bad' : ''));
+    skinsMsg.textContent = text || '';
+  }
 
-  openFlappy.addEventListener('click', ()=>{ flBack.classList.add('show'); syncUI(); draw(); });
+  function refreshSkinButtons(){
+    // buy buttons
+    buyRed.disabled = ownRed || (stars < PRICE_RED);
+    buyGreen.disabled = ownGreen || (stars < PRICE_GREEN);
+
+    // equip
+    equipRed.disabled = !ownRed;
+    equipGreen.disabled = !ownGreen;
+
+    // show current multiplier in flappy label too
+    flMultLabel.textContent = 'x' + currentSkin().flappyMult;
+  }
+
+  openSkins.addEventListener('click', ()=>{
+    setSkinsMsg('', null);
+    renderTop();
+    refreshSkinButtons();
+    skinsBack.classList.add('show');
+  });
+  closeSkins.addEventListener('click', ()=> skinsBack.classList.remove('show'));
+  skinsBack.addEventListener('click', (e)=>{ if (e.target === skinsBack) skinsBack.classList.remove('show'); });
+
+  function buySkin(which){
+    if (which === 'red'){
+      if (ownRed) return setSkinsMsg('Красная уже куплена.', true);
+      if (stars < PRICE_RED) return setSkinsMsg('Не хватает ⭐.', false);
+      stars -= PRICE_RED; ownRed = true; skinKey = 'red';
+      saveAll(); renderTop(); refreshSkinButtons();
+      setSkinsMsg('Куплено! Красная надета.', true);
+    }
+    if (which === 'green'){
+      if (ownGreen) return setSkinsMsg('Зелёная уже куплена.', true);
+      if (stars < PRICE_GREEN) return setSkinsMsg('Не хватает ⭐.', false);
+      stars -= PRICE_GREEN; ownGreen = true; skinKey = 'green';
+      saveAll(); renderTop(); refreshSkinButtons();
+      setSkinsMsg('Куплено! Зелёная надета.', true);
+    }
+  }
+
+  buyRed.addEventListener('click', ()=> buySkin('red'));
+  buyGreen.addEventListener('click', ()=> buySkin('green'));
+
+  equipRed.addEventListener('click', ()=>{
+    if (!ownRed) return;
+    skinKey = 'red';
+    saveAll(); renderTop(); refreshSkinButtons();
+    setSkinsMsg('Красная надета.', true);
+  });
+  equipGreen.addEventListener('click', ()=>{
+    if (!ownGreen) return;
+    skinKey = 'green';
+    saveAll(); renderTop(); refreshSkinButtons();
+    setSkinsMsg('Зелёная надета.', true);
+  });
+
+  howBuyStars.addEventListener('click', ()=>{
+    alert('Реальную покупку ⭐ через Telegram Stars подключают в боте (сервер). Сейчас это заглушка.');
+  });
+
+  // ---------- FLAPPY MODAL ----------
+  openFlappy.addEventListener('click', ()=>{
+    flBack.classList.add('show');
+    syncUI();
+    draw();
+  });
   closeFlappy.addEventListener('click', ()=> flBack.classList.remove('show'));
   flBack.addEventListener('click', (e)=>{ if (e.target === flBack) flBack.classList.remove('show'); });
 
-  // ---------- FLAPPY (ЧУТЬ ЛЕГЧЕ) ----------
+  // ---------- FLAPPY GAME (как раньше, но немного легче) ----------
   const cv = document.getElementById('cv');
   const ctx = cv.getContext('2d');
   const W = cv.width, H = cv.height;
 
   const TARGET = 40;
 
-  // БЫЛО сложнее — СТАЛО ЧУТЬ легче:
-  const GRAV = 0.44;     // было 0.45
-  const FLAP = -7.55;    // было -7.3
-  const SPEED = 2.50;    // было 2.6
-  const GAP = 165;       // было 150
+  // слегка легче (не “изи”)
+  const GRAV = 0.44;
+  const FLAP = -7.55;
+  const SPEED = 2.50;
+  const GAP = 165;
   const PIPE_W = 64;
-  const SPAWN_EVERY = 100; // было 95
+  const SPAWN_EVERY = 100;
 
   let state = 'idle'; // idle, play, over, win
   let stake = 0;
@@ -398,10 +703,11 @@
   const pipes = [];
   let spawnTimer = 0;
 
-  function setMsg(text, kind){
+  function setFlMsg(text, kind){
     flMsg.className = 'msg ' + (kind || '');
     flMsg.innerHTML = text || '';
   }
+
   function syncUI(){
     stakeNowEl.textContent = stake;
     scoreEl.textContent = score;
@@ -409,27 +715,32 @@
       state==='idle' ? 'не играем' :
       state==='play' ? 'игра' :
       state==='win' ? 'победа' : 'проиграл';
-    renderTap();
+    flMultLabel.textContent = 'x' + currentSkin().flappyMult;
+    renderTop();
   }
+
   function resetRound(toIdle=true){
     score = 0;
     duck.x = 90; duck.y = H/2; duck.vy = 0;
     pipes.length = 0;
     spawnTimer = 0;
     state = toIdle ? 'idle' : 'play';
-    setMsg('', '');
+    setFlMsg('', '');
     syncUI();
   }
+
   function addPipe(){
     const minTop = 70;
     const maxTop = H - 140 - GAP;
     const topH = Math.floor(minTop + Math.random()*(maxTop - minTop));
     pipes.push({ x: W + 20, topH, passed: false });
   }
+
   function flap(){
     if (state !== 'play') return;
     duck.vy = FLAP;
   }
+
   function hitPipe(p){
     const dx1 = duck.x - duck.r, dx2 = duck.x + duck.r;
     const dy1 = duck.y - duck.r, dy2 = duck.y + duck.r;
@@ -441,20 +752,25 @@
     if (!xOverlap) return false;
     return (dy1 < topY2) || (dy2 > botY1);
   }
+
   function win(){
     if (state !== 'play') return;
     state = 'win';
-    balance += (stake * 2);
-    saveTap();
-    setMsg(`✅ Победа! Выигрыш: <b>${stake} × 2</b>.`, 'good');
+    const mult = currentSkin().flappyMult;
+    const payout = Math.round(stake * mult); // выплата
+    balance += payout;
+    saveAll();
+    setFlMsg(`✅ Победа! Выигрыш: <b>${stake}</b> × <b>${mult}</b> = <b>${payout}</b>`, 'good');
     syncUI();
   }
+
   function gameOver(){
     if (state !== 'play') return;
     state = 'over';
-    setMsg(`❌ Проиграл. Ставка <b>${stake}</b> сгорела.`, 'bad');
+    setFlMsg(`❌ Проиграл. Ставка <b>${stake}</b> сгорела.`, 'bad');
     syncUI();
   }
+
   function update(){
     duck.vy += GRAV;
     duck.y += duck.vy;
@@ -599,22 +915,28 @@
 
   startFlappyBtn.addEventListener('click', ()=>{
     const s = Math.floor(Number(stakeInp.value));
-    if (!Number.isFinite(s) || s <= 0){ setMsg('Введите ставку (>0).', 'bad'); return; }
-    if (balance < s){ setMsg('Не хватает очков на ставку.', 'bad'); return; }
+    if (!Number.isFinite(s) || s <= 0){ setFlMsg('Введите ставку (>0).', 'bad'); return; }
+    if (balance < s){ setFlMsg('Не хватает очков на ставку.', 'bad'); return; }
 
-    balance -= s; saveTap(); renderTap();
+    balance -= s; // ставка списалась
     stake = s;
+    saveAll();
+
     resetRound(false);
     duck.vy = FLAP;
-    setMsg('Удачи! Цель — 40.', '');
+    setFlMsg('Удачи! Цель — 40.', '');
     syncUI();
   });
 
   restartBtn.addEventListener('click', ()=> resetRound(true));
 
+  // init
+  energy = clamp(energy, 0, ENERGY_MAX);
+  renderTop();
+  renderEnergy();
+  refreshSkinButtons();
   resetRound(true);
   requestAnimationFrame(loop);
 </script>
 </body>
 </html>
-
