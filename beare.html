@@ -1,42 +1,30 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Duck WebApp</title>
+  <title>Duck Tap + Flappy</title>
   <style>
     :root{
-      --bg1:#7dd3fc;
-      --bg2:#bae6fd;
-      --card:#ffffffcc;
-      --text:#0f172a;
-      --muted:#475569;
+      --bg1:#7dd3fc; --bg2:#bae6fd;
+      --card:#ffffffcc; --text:#0f172a; --muted:#475569;
       --shadow: 0 20px 60px rgba(2, 6, 23, .18);
-      --radius: 22px;
-
-      --ok:#16a34a;
-      --bad:#ef4444;
+      --radius: 22px; --ok:#16a34a; --bad:#ef4444; --warn:#f59e0b;
     }
     *{box-sizing:border-box}
     body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color:var(--text);
-      min-height:100vh;
-      display:grid;
-      place-items:center;
-      overflow:hidden;
+      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text); min-height:100vh; display:grid; place-items:center; overflow:hidden;
       background: linear-gradient(180deg, var(--bg1), var(--bg2));
     }
 
+    /* clouds */
     .cloud{ position:absolute; width:220px; height:70px; background:#fff; border-radius:999px; opacity:.85;
       box-shadow: 0 14px 40px rgba(2, 6, 23, .08); animation: drift linear infinite; }
-    .cloud::before, .cloud::after{ content:""; position:absolute; background:#fff; border-radius:999px; }
+    .cloud::before,.cloud::after{ content:""; position:absolute; background:#fff; border-radius:999px; }
     .cloud::before{ width:90px; height:90px; left:20px; top:-35px; }
     .cloud::after{ width:120px; height:120px; left:80px; top:-55px; }
     @keyframes drift{ from{ transform: translateX(-320px);} to{ transform: translateX(calc(100vw + 320px)); } }
-
-    .waves{ position:absolute; left:0; right:0; bottom:-1px; height:35vh; pointer-events:none; opacity:.9; }
 
     .card{
       position:relative;
@@ -49,539 +37,579 @@
       border: 1px solid rgba(255,255,255,.55);
       text-align:center;
     }
-
     h1{ margin:6px 0 6px; font-size: clamp(22px, 3.2vw, 32px); }
-    .sub{ margin:0 0 10px; color: var(--muted); font-size: 14px; }
-
-    .tabs{ display:flex; gap:10px; justify-content:center; margin: 10px 0 12px; flex-wrap:wrap; }
-    .tab{
-      border:none; cursor:pointer; border-radius:999px; padding:10px 14px; font-weight:900;
-      background: rgba(255,255,255,.75); color: var(--text);
-      border: 1px solid rgba(15, 23, 42, .08); box-shadow: 0 10px 24px rgba(2,6,23,.08);
-    }
-    .tab.active{ background: rgba(15, 23, 42, .92); color:#fff; border-color: transparent; }
-
-    .panel{ display:none; }
-    .panel.active{ display:block; }
-
-    .game-wrap{ display:grid; place-items:center; margin: 8px auto 10px; }
-    canvas{
-      width:min(420px, 92vw);
-      height:auto;
-      border-radius: 18px;
-      background: rgba(255,255,255,.55);
-      border: 1px solid rgba(15, 23, 42, .10);
-      box-shadow: 0 12px 30px rgba(2,6,23,.12);
-      touch-action: manipulation;
-      outline: none;
-    }
+    .sub{ margin:0 0 12px; color: var(--muted); font-size: 14px; }
 
     .hud{
-      width:min(420px, 92vw);
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      margin: 10px auto 0;
-      flex-wrap:wrap;
-      align-items:center;
-      color: var(--muted);
+      width:min(520px, 92vw);
+      margin: 0 auto 10px;
+      display:flex; justify-content:center; gap:10px; flex-wrap:wrap;
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 12px; border-radius:999px;
+      background: rgba(255,255,255,.75);
+      border: 1px solid rgba(15, 23, 42, .08);
+      box-shadow: 0 10px 24px rgba(2,6,23,.08);
       font-weight: 900;
-      font-size: 13px;
+    }
+    .pill small{ font-weight:900; color: var(--muted); }
+
+    /* tap duck */
+    .duck-wrap{
+      position:relative;
+      display:grid;
+      place-items:center;
+      margin: 8px auto 6px;
+      width:min(340px, 72vw);
+      aspect-ratio: 1 / 1;
+    }
+    .duck-btn{
+      width:100%; height:100%;
+      border:none; background:transparent;
+      cursor:pointer; padding:0;
+      display:grid; place-items:center;
+      user-select:none; -webkit-tap-highlight-color: transparent;
+      transition: transform .08s ease;
+    }
+    .duck-btn:active{ transform: scale(.98); }
+    .duck{
+      width: 86%;
+      max-width: 320px;
+      filter: drop-shadow(0 18px 28px rgba(2,6,23,.22));
+      transform-origin: 50% 70%;
+    }
+    .pop{ animation: pop .22s ease-out; }
+    @keyframes pop{
+      0%{ transform: translateY(0) rotate(0deg) scale(1); }
+      40%{ transform: translateY(-10px) rotate(-2deg) scale(1.03); }
+      100%{ transform: translateY(0) rotate(0deg) scale(1); }
+    }
+    .bubble{
+      position:absolute; width:14px; height:14px; border-radius:999px;
+      background: rgba(255,255,255,.85);
+      box-shadow: inset 0 -2px 0 rgba(2,6,23,.06);
+      animation: rise .9s ease-out forwards;
+      pointer-events:none;
+    }
+    @keyframes rise{
+      from{ transform: translateY(0) scale(.9); opacity: 1; }
+      to{ transform: translateY(-90px) scale(1.35); opacity: 0; }
     }
 
-    .btn-row{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top: 10px; }
+    .hint{ margin-top:10px; font-size: 13px; color: var(--muted); }
+
+    /* floating flappy button */
+    .float{
+      position:fixed;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 50;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      align-items:flex-end;
+    }
+    .fab{
+      width:56px; height:56px;
+      border-radius:999px;
+      border:none;
+      cursor:pointer;
+      background: rgba(15, 23, 42, .92);
+      color:#fff;
+      font-weight: 1000;
+      box-shadow: 0 16px 40px rgba(2,6,23,.22);
+    }
+    .fab span{ display:block; font-size:10px; letter-spacing:.4px; margin-top:2px; opacity:.9; }
+    .fab:active{ transform: scale(.98); }
+
+    /* modal */
+    .modal-back{
+      position:fixed; inset:0; z-index:100;
+      background: rgba(2,6,23,.45);
+      display:none;
+      align-items:center; justify-content:center;
+      padding: 16px;
+    }
+    .modal-back.show{ display:flex; }
+    .modal{
+      width:min(620px, 96vw);
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(15,23,42,.10);
+      border-radius: 22px;
+      box-shadow: 0 22px 70px rgba(2,6,23,.28);
+      padding: 14px;
+      text-align:center;
+    }
+    .modal h2{ margin:6px 0 6px; font-size: 20px; }
+    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; justify-content:center; margin-top: 10px; }
+    label{ display:block; font-weight: 1000; color: var(--muted); font-size: 12px; margin-bottom:6px; text-align:left; }
+    input{
+      width: 220px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(15,23,42,.12);
+      outline:none;
+      font-weight: 1000;
+      background: rgba(255,255,255,.95);
+    }
     .btn{
-      border:none; cursor:pointer; border-radius: 14px; padding: 10px 14px; font-weight: 900;
-      background: rgba(15, 23, 42, .92); color:#fff; box-shadow: 0 12px 30px rgba(2,6,23,.18);
+      border:none; cursor:pointer; border-radius: 14px; padding: 10px 14px; font-weight: 1000;
+      background: rgba(15, 23, 42, .92); color:#fff;
+      box-shadow: 0 12px 30px rgba(2,6,23,.18);
     }
     .btn.secondary{
       background: rgba(255,255,255,.85); color: var(--text);
       border: 1px solid rgba(15, 23, 42, .10);
     }
-
-    .form{
-      width:min(520px, 92vw);
-      margin: 10px auto 0;
-      text-align:left;
-      background: rgba(255,255,255,.65);
-      border: 1px solid rgba(15, 23, 42, .08);
-      border-radius: 18px;
-      padding: 12px;
-      box-shadow: 0 10px 24px rgba(2,6,23,.08);
-    }
-    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; margin-bottom: 10px; }
-    label{ font-weight: 900; font-size: 13px; color: var(--muted); display:block; margin-bottom: 6px; }
-    input{
-      width:100%; padding: 10px 12px; border-radius: 14px;
-      border: 1px solid rgba(15,23,42,.12); outline:none; font-weight: 900; background: rgba(255,255,255,.9);
-    }
-    .col{ flex: 1 1 240px; min-width: 240px; }
-    .msg{ margin-top: 6px; font-weight: 900; font-size: 13px; color: var(--muted); }
+    .msg{ margin-top:10px; font-weight: 1000; font-size: 13px; color: var(--muted); }
     .msg.good{ color: var(--ok); }
     .msg.bad{ color: var(--bad); }
 
-    .hint{ margin-top:10px; font-size: 13px; color: var(--muted); }
-
-    .overlayTip{
+    /* flappy canvas */
+    canvas{
       width:min(420px, 92vw);
-      margin: 10px auto 0;
-      padding: 10px 12px;
-      border-radius: 16px;
-      background: rgba(255,255,255,.7);
-      border: 1px solid rgba(15, 23, 42, .08);
-      color: var(--muted);
-      font-weight: 900;
-      font-size: 13px;
-      box-shadow: 0 10px 24px rgba(2,6,23,.08);
+      height:auto;
+      border-radius: 18px;
+      background: rgba(255,255,255,.65);
+      border: 1px solid rgba(15, 23, 42, .10);
+      box-shadow: 0 12px 30px rgba(2,6,23,.12);
+      touch-action: manipulation;
+      outline:none;
+      margin-top: 10px;
+    }
+    .flhud{
+      display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
+      width:min(420px, 92vw); margin: 8px auto 0;
+      color: var(--muted); font-weight:1000; font-size: 13px;
     }
   </style>
 </head>
+
 <body>
   <div class="cloud" style="top:8vh; left:-260px; animation-duration: 42s;"></div>
   <div class="cloud" style="top:16vh; left:-360px; animation-duration: 55s; transform: scale(.9); opacity:.75;"></div>
   <div class="cloud" style="top:26vh; left:-420px; animation-duration: 48s; transform: scale(1.1); opacity:.8;"></div>
 
   <div class="card">
-    <h1>Duck WebApp 🦆</h1>
-    <div class="sub">Flappy Duck + перевод очков в рубли</div>
+    <h1>Уточка-таpалка 🦆</h1>
+    <div class="sub">Тапай утку — копи очки. Flappy открывается шариком справа.</div>
 
-    <div class="tabs">
-      <button class="tab active" id="tabGame" type="button">Игра</button>
-      <button class="tab" id="tabRub" type="button">Перевод в рубли</button>
-      <button class="tab" id="tabPromo" type="button">Промокод</button>
+    <div class="hud">
+      <div class="pill">⭐ <span id="balance">0</span> <small>очки</small></div>
+      <div class="pill">💥 <span id="taps">0</span> <small>тапов</small></div>
     </div>
 
-    <!-- GAME -->
-    <div class="panel active" id="panelGame">
-      <div class="game-wrap">
-        <canvas id="cv" width="360" height="512"></canvas>
+    <div class="duck-wrap" id="arena">
+      <button class="duck-btn" id="duckBtn" aria-label="Тап по уточке">
+        <img
+          id="duckImg"
+          class="duck"
+          alt="Уточка"
+          src="https://commons.wikimedia.org/wiki/Special:FilePath/Rubber%20duck.svg"
+        />
+      </button>
+    </div>
+
+    <div class="hint">Очки сохраняются в браузере. Flappy — ставка/испытание на 40 пролётов.</div>
+  </div>
+
+  <!-- floating side button -->
+  <div class="float">
+    <button class="fab" id="openFlappy" type="button">🎮<span>Flappy</span></button>
+  </div>
+
+  <!-- modal -->
+  <div class="modal-back" id="modalBack">
+    <div class="modal">
+      <h2>Flappy Duck — ставка</h2>
+      <div class="msg" id="flInfo">
+        Правила: делай ставку очками. Пройди <b>40</b> столбов → получишь <b>x2</b>.
+        Проиграл → ставка сгорает.
       </div>
 
-      <div class="hud">
-        <div>Очки: <span id="score">0</span></div>
-        <div>Лучшее: <span id="best">0</span></div>
-        <div>Всего: <span id="total">0</span></div>
+      <div class="row">
+        <div>
+          <label>Ставка (очки)</label>
+          <input id="stakeInp" type="number" min="1" step="1" placeholder="например 50"/>
+        </div>
+        <button class="btn" id="startFlappy" type="button">Играть</button>
+        <button class="btn secondary" id="closeFlappy" type="button">Закрыть</button>
       </div>
 
-      <div class="btn-row">
-        <button class="btn" id="startBtn" type="button">Старт</button>
+      <canvas id="cv" width="360" height="512" aria-label="Flappy Duck"></canvas>
+
+      <div class="flhud">
+        <div>Счёт: <span id="score">0</span>/40</div>
+        <div>Ставка: <span id="stakeNow">0</span></div>
+        <div>Статус: <span id="status">не играем</span></div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
         <button class="btn secondary" id="restartBtn" type="button">Рестарт</button>
-        <button class="btn secondary" id="resetTotalBtn" type="button">Сбросить “всего”</button>
       </div>
 
-      <div class="overlayTip" id="tip">Нажми <b>Старт</b>. Во время игры: тап/клик по экрану или пробел — прыжок.</div>
-    </div>
-
-    <!-- RUB -->
-    <div class="panel" id="panelRub">
-      <div class="form">
-        <div class="row">
-          <div class="col">
-            <label>Мои очки (всего)</label>
-            <input id="rubPoints" type="number" readonly />
-          </div>
-          <div class="col">
-            <label>Курс</label>
-            <input id="rateFixed" type="text" readonly />
-          </div>
-        </div>
-
-        <div class="row">
-          <button class="btn" id="calcBtn" type="button">Перевести в рубли</button>
-          <button class="btn secondary" id="backToGame1" type="button">Выйти в игру</button>
-        </div>
-
-        <div class="msg good" id="rubOut">Нажми «Перевести в рубли».</div>
-      </div>
-      <div class="hint">Перевод идёт <b>только: очки → рубли</b>.</div>
-    </div>
-
-    <!-- PROMO -->
-    <div class="panel" id="panelPromo">
-      <div class="form">
-        <div class="row">
-          <div class="col">
-            <label>Введите промокод</label>
-            <input id="promo" autocomplete="off" />
-          </div>
-          <button class="btn" id="promoBtn" type="button">Активировать</button>
-          <button class="btn secondary" id="backToGame2" type="button">Выйти в игру</button>
-        </div>
-        <div class="msg" id="promoMsg"></div>
-      </div>
-      <div class="hint">Промокод даёт бонус (ограничение по активациям).</div>
+      <div class="msg" id="flMsg"></div>
     </div>
   </div>
 
-  <svg class="waves" viewBox="0 0 1440 320" preserveAspectRatio="none" aria-hidden="true">
-    <path fill="rgba(255,255,255,.55)" d="M0,192L80,165.3C160,139,320,85,480,90.7C640,96,800,160,960,181.3C1120,203,1280,181,1360,170.7L1440,160L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path>
-    <path fill="rgba(255,255,255,.35)" d="M0,256L96,234.7C192,213,384,171,576,170.7C768,171,960,213,1152,218.7C1344,224,1536,192,1632,176L1728,160L1728,320L1632,320C1536,320,1344,320,1152,320C960,320,768,320,576,320C384,320,192,320,96,320L0,320Z"></path>
-  </svg>
+<script>
+  // ---------- TAP GAME ----------
+  const K_BAL = 'duck_balance';
+  const K_TAPS = 'duck_taps';
 
-  <script>
-    // ---------- STORAGE ----------
-    const K_BEST = 'fd_best';
-    const K_TOTAL = 'fd_total';
-    const K_PROMO_USES = 'fd_promo_uses';
+  let balance = Number(localStorage.getItem(K_BAL) || 0);
+  let taps = Number(localStorage.getItem(K_TAPS) || 0);
 
-    // фиксированный курс
-    const RUB_PER_POINT = 0.01;
+  const balanceEl = document.getElementById('balance');
+  const tapsEl = document.getElementById('taps');
+  const duckBtn = document.getElementById('duckBtn');
+  const duckImg = document.getElementById('duckImg');
+  const arena = document.getElementById('arena');
 
-    // промокод (в интерфейсе НЕ показываем)
-    const SECRET_CODE = 'тест';
-    const PROMO_MAX_USES = 2;
-    const PROMO_BONUS_POINTS = 200;
+  function saveTap(){
+    localStorage.setItem(K_BAL, String(balance));
+    localStorage.setItem(K_TAPS, String(taps));
+  }
+  function renderTap(){
+    balanceEl.textContent = balance;
+    tapsEl.textContent = taps;
+  }
+  function popDuck(){
+    duckImg.classList.remove('pop');
+    void duckImg.offsetWidth;
+    duckImg.classList.add('pop');
+  }
+  function bubble(clientX, clientY){
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    const rect = arena.getBoundingClientRect();
+    b.style.left = (clientX - rect.left) + 'px';
+    b.style.top  = (clientY - rect.top) + 'px';
+    const size = 10 + Math.random()*16;
+    b.style.width = b.style.height = size + 'px';
+    arena.appendChild(b);
+    setTimeout(()=> b.remove(), 900);
+  }
 
-    // ---------- TABS ----------
-    const tabGame = document.getElementById('tabGame');
-    const tabRub = document.getElementById('tabRub');
-    const tabPromo = document.getElementById('tabPromo');
-    const panelGame = document.getElementById('panelGame');
-    const panelRub = document.getElementById('panelRub');
-    const panelPromo = document.getElementById('panelPromo');
+  duckBtn.addEventListener('click', (e)=>{
+    taps += 1;
+    balance += 1; // 1 тап = 1 очко
+    saveTap();
+    renderTap();
+    popDuck();
+    bubble(e.clientX, e.clientY);
+  }, {passive:true});
 
-    function setTab(name){
-      tabGame.classList.toggle('active', name==='game');
-      tabRub.classList.toggle('active', name==='rub');
-      tabPromo.classList.toggle('active', name==='promo');
+  renderTap();
 
-      panelGame.classList.toggle('active', name==='game');
-      panelRub.classList.toggle('active', name==='rub');
-      panelPromo.classList.toggle('active', name==='promo');
+  // ---------- FLAPPY MODAL ----------
+  const modalBack = document.getElementById('modalBack');
+  const openFlappy = document.getElementById('openFlappy');
+  const closeFlappy = document.getElementById('closeFlappy');
+  const startFlappyBtn = document.getElementById('startFlappy');
+  const stakeInp = document.getElementById('stakeInp');
+  const stakeNowEl = document.getElementById('stakeNow');
+  const scoreEl = document.getElementById('score');
+  const statusEl = document.getElementById('status');
+  const flMsg = document.getElementById('flMsg');
+  const restartBtn = document.getElementById('restartBtn');
 
-      if (name==='rub') syncRubPoints();
+  openFlappy.addEventListener('click', ()=>{
+    modalBack.classList.add('show');
+    syncUI();
+    draw(); // show screen
+  });
+  closeFlappy.addEventListener('click', ()=> modalBack.classList.remove('show'));
+  modalBack.addEventListener('click', (e)=>{
+    if (e.target === modalBack) modalBack.classList.remove('show');
+  });
+
+  // ---------- FLAPPY GAME ----------
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+
+  const TARGET = 40;
+
+  let state = 'idle'; // idle, play, over, win
+  let stake = 0;
+  let score = 0;
+
+  const duck = { x: 90, y: H/2, vy: 0, r: 16 };
+  const GRAV = 0.45;
+  const FLAP = -7.3;
+
+  const pipes = [];
+  const PIPE_W = 64;
+  const GAP = 150;
+  let spawnTimer = 0;
+
+  function setMsg(text, kind){
+    flMsg.className = 'msg ' + (kind || '');
+    flMsg.innerHTML = text || '';
+  }
+
+  function syncUI(){
+    stakeNowEl.textContent = stake;
+    scoreEl.textContent = score;
+    statusEl.textContent =
+      state==='idle' ? 'не играем' :
+      state==='play' ? 'игра' :
+      state==='win' ? 'победа' : 'проиграл';
+    renderTap(); // обновляем баланс сверху (вдруг изменился)
+  }
+
+  function resetRound(toIdle=true){
+    score = 0;
+    duck.x = 90; duck.y = H/2; duck.vy = 0;
+    pipes.length = 0;
+    spawnTimer = 0;
+    state = toIdle ? 'idle' : 'play';
+    setMsg('', '');
+    syncUI();
+  }
+
+  function addPipe(){
+    const minTop = 70;
+    const maxTop = H - 140 - GAP;
+    const topH = Math.floor(minTop + Math.random()*(maxTop - minTop));
+    pipes.push({ x: W + 20, topH, passed: false });
+  }
+
+  function flap(){
+    if (state !== 'play') return;
+    duck.vy = FLAP;
+  }
+
+  function hitPipe(p){
+    const dx1 = duck.x - duck.r, dx2 = duck.x + duck.r;
+    const dy1 = duck.y - duck.r, dy2 = duck.y + duck.r;
+    const px1 = p.x, px2 = p.x + PIPE_W;
+    const topY2 = p.topH;
+    const botY1 = p.topH + GAP;
+
+    const xOverlap = !(dx2 < px1 || dx1 > px2);
+    if (!xOverlap) return false;
+    return (dy1 < topY2) || (dy2 > botY1);
+  }
+
+  function win(){
+    if (state !== 'play') return;
+    state = 'win';
+    // ставка уже списана при старте. Победа => возвращаем 2x, значит +2*stake
+    balance += (stake * 2);
+    saveTap();
+    setMsg(`✅ Победа! Ты прошёл <b>${TARGET}</b>. Выигрыш: <b>${stake} × 2</b>.`, 'good');
+    syncUI();
+  }
+
+  function gameOver(){
+    if (state !== 'play') return;
+    state = 'over';
+    setMsg(`❌ Проиграл. Ставка <b>${stake}</b> сгорела.`, 'bad');
+    syncUI();
+  }
+
+  function update(){
+    duck.vy += GRAV;
+    duck.y += duck.vy;
+
+    if (duck.y > H - 30){
+      duck.y = H - 30;
+      gameOver();
     }
-
-    tabGame.addEventListener('click', ()=>setTab('game'));
-    tabRub.addEventListener('click', ()=>setTab('rub'));
-    tabPromo.addEventListener('click', ()=>setTab('promo'));
-
-    document.getElementById('backToGame1').addEventListener('click', ()=>setTab('game'));
-    document.getElementById('backToGame2').addEventListener('click', ()=>setTab('game'));
-
-    // ---------- HUD ----------
-    const scoreEl = document.getElementById('score');
-    const bestEl = document.getElementById('best');
-    const totalEl = document.getElementById('total');
-    const tipEl = document.getElementById('tip');
-
-    let best = Number(localStorage.getItem(K_BEST) || 0);
-    let total = Number(localStorage.getItem(K_TOTAL) || 0);
-    bestEl.textContent = best;
-    totalEl.textContent = total;
-
-    function saveMeta(){
-      localStorage.setItem(K_BEST, String(best));
-      localStorage.setItem(K_TOTAL, String(total));
-      bestEl.textContent = best;
-      totalEl.textContent = total;
-    }
-
-    // ---------- FLAPPY DUCK ----------
-    const cv = document.getElementById('cv');
-    const ctx = cv.getContext('2d');
-    const W = cv.width, H = cv.height;
-
-    // state: menu (стоит), play (игра), over (проиграл)
-    let state = 'menu';
-    let score = 0;
-
-    const duck = { x: 90, y: H/2, vy: 0, r: 16 };
-    const GRAV = 0.45;
-    const FLAP = -7.3;
-
-    const pipes = [];
-    const PIPE_W = 64;
-    const GAP = 150;
-    let spawnTimer = 0;
-
-    function drawDuck(x,y,rot){
-      ctx.save();
-      ctx.translate(x,y);
-      ctx.rotate(rot);
-
-      ctx.beginPath();
-      ctx.ellipse(0,0,18,14,0,0,Math.PI*2);
-      ctx.fillStyle = '#fbbf24';
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.ellipse(-2,3,10,8,0,0,Math.PI*2);
-      ctx.fillStyle = '#fde68a';
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.ellipse(14,-8,10,9,0,0,Math.PI*2);
-      ctx.fillStyle = '#fbbf24';
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.ellipse(26,-6,8,4,0,0,Math.PI*2);
-      ctx.fillStyle = '#fb923c';
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.arc(16,-10,2.2,0,Math.PI*2);
-      ctx.fillStyle = '#0f172a';
-      ctx.fill();
-
-      ctx.restore();
-    }
-
-    function resetRound(toMenu=true){
-      score = 0;
-      scoreEl.textContent = score;
-
-      duck.x = 90;
-      duck.y = H/2;
+    if (duck.y < 10){
+      duck.y = 10;
       duck.vy = 0;
+    }
 
-      pipes.length = 0;
+    spawnTimer += 1;
+    if (spawnTimer > 95){
       spawnTimer = 0;
-
-      state = toMenu ? 'menu' : 'play';
-      tipEl.innerHTML = toMenu
-        ? 'Нажми <b>Старт</b>. Во время игры: тап/клик или пробел — прыжок.'
-        : 'Игра идёт! Тап/клик или пробел — прыжок.';
+      addPipe();
     }
 
-    function addPipe(){
-      const minTop = 70;
-      const maxTop = H - 140 - GAP;
-      const topH = Math.floor(minTop + Math.random()*(maxTop - minTop));
-      pipes.push({ x: W + 20, topH, passed: false });
-    }
+    for (const p of pipes){
+      p.x -= 2.6;
 
-    function flap(){
-      // прыжок разрешён ТОЛЬКО во время игры
-      if (state !== 'play') return;
-      duck.vy = FLAP;
-    }
+      if (!p.passed && p.x + PIPE_W < duck.x){
+        p.passed = true;
+        score += 1;
+        if (score >= TARGET){
+          win();
+        }
+      }
 
-    function hitPipe(p){
-      const dx1 = duck.x - duck.r, dx2 = duck.x + duck.r;
-      const dy1 = duck.y - duck.r, dy2 = duck.y + duck.r;
-      const px1 = p.x, px2 = p.x + PIPE_W;
-      const topY2 = p.topH;
-      const botY1 = p.topH + GAP;
-
-      const xOverlap = !(dx2 < px1 || dx1 > px2);
-      if (!xOverlap) return false;
-
-      return (dy1 < topY2) || (dy2 > botY1);
-    }
-
-    function gameOver(){
-      if (state !== 'play') return;
-      state = 'over';
-      tipEl.innerHTML = 'Проиграл 😅 Нажми <b>Рестарт</b> или <b>Старт</b>.';
-
-      if (score > best) best = score;
-      total += score;
-      saveMeta();
-    }
-
-    function update(){
-      duck.vy += GRAV;
-      duck.y += duck.vy;
-
-      if (duck.y > H - 30){
-        duck.y = H - 30;
+      if (hitPipe(p)){
         gameOver();
       }
-      if (duck.y < 10){
-        duck.y = 10;
-        duck.vy = 0;
-      }
-
-      spawnTimer += 1;
-      if (spawnTimer > 95){
-        spawnTimer = 0;
-        addPipe();
-      }
-
-      for (const p of pipes){
-        p.x -= 2.6;
-
-        if (!p.passed && p.x + PIPE_W < duck.x){
-          p.passed = true;
-          score += 1;
-          scoreEl.textContent = score;
-        }
-
-        if (hitPipe(p)) gameOver();
-      }
-
-      while (pipes.length && pipes[0].x + PIPE_W < -20){
-        pipes.shift();
-      }
     }
 
-    function drawBackground(){
-      ctx.clearRect(0,0,W,H);
-      const g = ctx.createLinearGradient(0,0,0,H);
-      g.addColorStop(0,'#93c5fd');
-      g.addColorStop(1,'#bae6fd');
-      ctx.fillStyle = g;
-      ctx.fillRect(0,0,W,H);
-
-      ctx.fillStyle = 'rgba(255,255,255,.55)';
-      ctx.beginPath();
-      ctx.moveTo(0,H-90);
-      ctx.quadraticCurveTo(W*0.25,H-140,W*0.5,H-105);
-      ctx.quadraticCurveTo(W*0.75,H-70,W,H-115);
-      ctx.lineTo(W,H);
-      ctx.lineTo(0,H);
-      ctx.closePath();
-      ctx.fill();
-
-      ctx.fillStyle = 'rgba(15,23,42,.08)';
-      ctx.fillRect(0,H-28,W,28);
+    while (pipes.length && pipes[0].x + PIPE_W < -20){
+      pipes.shift();
     }
+  }
 
-    function drawPipes(){
-      for (const p of pipes){
-        ctx.fillStyle = 'rgba(15,23,42,.18)';
-        ctx.strokeStyle = 'rgba(15,23,42,.20)';
-        ctx.lineWidth = 2;
+  function drawDuck(x,y,rot){
+    ctx.save();
+    ctx.translate(x,y);
+    ctx.rotate(rot);
 
-        ctx.fillRect(p.x, 0, PIPE_W, p.topH);
-        ctx.strokeRect(p.x, 0, PIPE_W, p.topH);
+    ctx.beginPath(); ctx.ellipse(0,0,18,14,0,0,Math.PI*2);
+    ctx.fillStyle = '#fbbf24'; ctx.fill();
 
-        const by = p.topH + GAP;
-        ctx.fillRect(p.x, by, PIPE_W, H - by - 28);
-        ctx.strokeRect(p.x, by, PIPE_W, H - by - 28);
-      }
+    ctx.beginPath(); ctx.ellipse(-2,3,10,8,0,0,Math.PI*2);
+    ctx.fillStyle = '#fde68a'; ctx.fill();
+
+    ctx.beginPath(); ctx.ellipse(14,-8,10,9,0,0,Math.PI*2);
+    ctx.fillStyle = '#fbbf24'; ctx.fill();
+
+    ctx.beginPath(); ctx.ellipse(26,-6,8,4,0,0,Math.PI*2);
+    ctx.fillStyle = '#fb923c'; ctx.fill();
+
+    ctx.beginPath(); ctx.arc(16,-10,2.2,0,Math.PI*2);
+    ctx.fillStyle = '#0f172a'; ctx.fill();
+
+    ctx.restore();
+  }
+
+  function drawBackground(){
+    ctx.clearRect(0,0,W,H);
+    const g = ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'#93c5fd');
+    g.addColorStop(1,'#bae6fd');
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,W,H);
+
+    ctx.fillStyle = 'rgba(255,255,255,.55)';
+    ctx.beginPath();
+    ctx.moveTo(0,H-90);
+    ctx.quadraticCurveTo(W*0.25,H-140,W*0.5,H-105);
+    ctx.quadraticCurveTo(W*0.75,H-70,W,H-115);
+    ctx.lineTo(W,H); ctx.lineTo(0,H);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = 'rgba(15,23,42,.08)';
+    ctx.fillRect(0,H-28,W,28);
+  }
+
+  function drawPipes(){
+    for (const p of pipes){
+      ctx.fillStyle = 'rgba(15,23,42,.18)';
+      ctx.strokeStyle = 'rgba(15,23,42,.20)';
+      ctx.lineWidth = 2;
+
+      ctx.fillRect(p.x, 0, PIPE_W, p.topH);
+      ctx.strokeRect(p.x, 0, PIPE_W, p.topH);
+
+      const by = p.topH + GAP;
+      ctx.fillRect(p.x, by, PIPE_W, H - by - 28);
+      ctx.strokeRect(p.x, by, PIPE_W, H - by - 28);
     }
+  }
 
-    function draw(){
-      drawBackground();
-      drawPipes();
+  function drawOverlay(text){
+    ctx.fillStyle = 'rgba(255,255,255,.78)';
+    ctx.strokeStyle = 'rgba(15,23,42,.10)';
+    ctx.lineWidth = 2;
+    const bw = 300, bh = 96;
+    const bx = (W-bw)/2, by = 78;
+    roundRect(bx,by,bw,bh,18,true,true);
 
-      const rot = Math.max(-0.6, Math.min(0.8, duck.vy * 0.06));
-      drawDuck(duck.x, duck.y, rot);
+    ctx.fillStyle = '#0f172a';
+    ctx.font = '1000 16px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText(text, W/2, by+40);
 
-      ctx.fillStyle = 'rgba(15,23,42,.75)';
-      ctx.font = '900 22px system-ui';
-      ctx.textAlign = 'left';
-      ctx.fillText(String(score), 14, 34);
+    ctx.fillStyle = '#475569';
+    ctx.font = '900 13px system-ui';
+    ctx.fillText('Тап/клик/пробел — прыжок (только в игре)', W/2, by+66);
+  }
 
-      // menu/over overlay
-      if (state === 'menu'){
-        ctx.fillStyle = 'rgba(255,255,255,.75)';
-        ctx.strokeStyle = 'rgba(15,23,42,.10)';
-        ctx.lineWidth = 2;
-        roundRect((W-300)/2, 78, 300, 86, 18, true, true);
-        ctx.fillStyle = '#0f172a';
-        ctx.font = '900 18px system-ui';
-        ctx.textAlign = 'center';
-        ctx.fillText('Нажми “Старт”', W/2, 118);
-      }
-      if (state === 'over'){
-        ctx.fillStyle = 'rgba(255,255,255,.75)';
-        ctx.strokeStyle = 'rgba(15,23,42,.10)';
-        ctx.lineWidth = 2;
-        roundRect((W-300)/2, 78, 300, 96, 18, true, true);
-        ctx.fillStyle = '#0f172a';
-        ctx.font = '900 18px system-ui';
-        ctx.textAlign = 'center';
-        ctx.fillText('Проиграл', W/2, 116);
-        ctx.fillStyle = '#475569';
-        ctx.font = '900 14px system-ui';
-        ctx.fillText(`Очки: ${score}`, W/2, 144);
-      }
+  function roundRect(x,y,w,h,r,fill,stroke){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+    if (fill) ctx.fill();
+    if (stroke) ctx.stroke();
+  }
+
+  function draw(){
+    drawBackground();
+    drawPipes();
+    const rot = Math.max(-0.6, Math.min(0.8, duck.vy * 0.06));
+    drawDuck(duck.x, duck.y, rot);
+
+    // score top-left
+    ctx.fillStyle = 'rgba(15,23,42,.75)';
+    ctx.font = '1000 22px system-ui';
+    ctx.textAlign = 'left';
+    ctx.fillText(String(score), 14, 34);
+
+    if (state === 'idle'){
+      drawOverlay('Введи ставку и нажми “Играть”');
+    } else if (state === 'over'){
+      drawOverlay('Проиграл. Нажми “Рестарт”');
+    } else if (state === 'win'){
+      drawOverlay('Победа! Нажми “Рестарт”');
     }
+  }
 
-    function roundRect(x,y,w,h,r,fill,stroke){
-      ctx.beginPath();
-      ctx.moveTo(x+r,y);
-      ctx.arcTo(x+w,y,x+w,y+h,r);
-      ctx.arcTo(x+w,y+h,x,y+h,r);
-      ctx.arcTo(x,y+h,x,y,r);
-      ctx.arcTo(x,y,x+w,y,r);
-      ctx.closePath();
-      if (fill) ctx.fill();
-      if (stroke) ctx.stroke();
+  function loop(){
+    if (state === 'play'){
+      update();
     }
-
-    function loop(){
-      if (state === 'play') update();
-      draw();
-      requestAnimationFrame(loop);
-    }
-
-    // controls: ONLY flaps in play
-    cv.addEventListener('pointerdown', (e)=>{ e.preventDefault(); flap(); }, {passive:false});
-    window.addEventListener('keydown', (e)=>{
-      if (e.code === 'Space'){
-        e.preventDefault();
-        flap();
-      }
-    }, {passive:false});
-
-    // buttons
-    document.getElementById('startBtn').addEventListener('click', ()=>{
-      // start from menu or over
-      if (state === 'menu' || state === 'over'){
-        resetRound(false);
-        duck.vy = FLAP;
-      }
-    });
-    document.getElementById('restartBtn').addEventListener('click', ()=>{
-      resetRound(true);
-    });
-    document.getElementById('resetTotalBtn').addEventListener('click', ()=>{
-      total = 0;
-      saveMeta();
-    });
-
-    resetRound(true);
+    draw();
     requestAnimationFrame(loop);
+  }
 
-    // ---------- RUB ----------
-    const rubPointsInp = document.getElementById('rubPoints');
-    const rateFixedInp = document.getElementById('rateFixed');
-    const rubOut = document.getElementById('rubOut');
-
-    function syncRubPoints(){
-      rubPointsInp.value = String(total);
-      rateFixedInp.value = `1 очко = ${RUB_PER_POINT.toFixed(2)} ₽`;
+  // controls
+  cv.addEventListener('pointerdown', (e)=>{ e.preventDefault(); flap(); }, {passive:false});
+  window.addEventListener('keydown', (e)=>{
+    if (e.code === 'Space'){
+      e.preventDefault();
+      flap();
     }
-    syncRubPoints();
+  }, {passive:false});
 
-    document.getElementById('calcBtn').addEventListener('click', ()=>{
-      syncRubPoints();
-      const rub = total * RUB_PER_POINT;
-      rubOut.className = 'msg good';
-      rubOut.textContent = `Сумма: ${rub.toFixed(2)} ₽`;
-    });
-
-    // ---------- PROMO ----------
-    const promoInp = document.getElementById('promo');
-    const promoMsg = document.getElementById('promoMsg');
-    let promoUses = Number(localStorage.getItem(K_PROMO_USES) || 0);
-    if (!Number.isFinite(promoUses)) promoUses = 0;
-
-    function setPromo(text, ok){
-      promoMsg.className = 'msg ' + (ok ? 'good' : 'bad');
-      promoMsg.textContent = text;
-      setTimeout(()=>{ promoMsg.className='msg'; }, 2500);
+  startFlappyBtn.addEventListener('click', ()=>{
+    const s = Math.floor(Number(stakeInp.value));
+    if (!Number.isFinite(s) || s <= 0){
+      setMsg('Введите нормальную ставку (целое число > 0).', 'bad');
+      return;
+    }
+    if (balance < s){
+      setMsg('Не хватает очков на ставку.', 'bad');
+      return;
     }
 
-    document.getElementById('promoBtn').addEventListener('click', ()=>{
-      const code = (promoInp.value || '').trim().toLowerCase();
-      if (!code){ setPromo('Введи код.', false); return; }
-      if (code !== SECRET_CODE){ setPromo('Неверный код.', false); return; }
-      if (promoUses >= PROMO_MAX_USES){ setPromo('Лимит активаций исчерпан.', false); return; }
+    // списываем ставку сразу
+    balance -= s;
+    taps += 0; // не трогаем
+    saveTap();
+    renderTap();
 
-      promoUses += 1;
-      localStorage.setItem(K_PROMO_USES, String(promoUses));
+    stake = s;
+    resetRound(false);
+    duck.vy = FLAP;
+    setMsg('Удачи! Цель — 40.', '');
+    syncUI();
+  });
 
-      total += PROMO_BONUS_POINTS;
-      saveMeta();
-      promoInp.value = '';
-      setPromo('Бонус получен.', true);
-    });
-  </script>
+  restartBtn.addEventListener('click', ()=>{
+    resetRound(true);
+  });
+
+  // init
+  resetRound(true);
+  requestAnimationFrame(loop);
+</script>
 </body>
 </html>
