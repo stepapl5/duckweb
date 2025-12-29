@@ -132,7 +132,6 @@
       box-shadow: 0 16px 40px rgba(2,6,23,.22);
     }
     .fab span{ display:block; font-size:10px; letter-spacing:.4px; margin-top:2px; opacity:.9; }
-    .fab:active{ transform: scale(.98); }
 
     /* modal */
     .modal-back{
@@ -214,7 +213,7 @@
 
   <div class="card">
     <h1>Кликер уточки 🦆</h1>
-    <div class="sub">Нажимай на утку — получай очки. Справа круг: Flappy со ставкой.</div>
+    <div class="sub">Кликай по утке → очки. Справа: ₽ (перевод) и Flappy (ставка).</div>
 
     <div class="topbar">
       <div class="pill">⭐ <span id="balance">0</span> <small>очки</small></div>
@@ -228,19 +227,20 @@
       </button>
     </div>
 
-    <div class="hint">Перевод в рубли (0.01 ₽ за 1 очко) — кнопка ₽ справа.</div>
+    <div class="hint">Перевод: 1 очко = 0.01 ₽. В Flappy нужно пройти 40.</div>
   </div>
 
+  <!-- FLOAT BUTTONS -->
   <div class="float">
     <button class="fab" id="openRub" type="button">₽<span>Рубли</span></button>
     <button class="fab" id="openFlappy" type="button">🎮<span>Flappy</span></button>
   </div>
 
-  <!-- RUB modal -->
+  <!-- RUB MODAL (ПЕРЕВОД В РУБЛИ) -->
   <div class="modal-back" id="rubBack">
     <div class="modal">
       <h2>Перевод в рубли</h2>
-      <div class="msg">Курс фиксированный: <b>1 очко = 0.01 ₽</b></div>
+      <div class="msg">Курс: <b>1 очко = 0.01 ₽</b></div>
 
       <div class="row">
         <div>
@@ -260,13 +260,11 @@
     </div>
   </div>
 
-  <!-- FLAPPY modal -->
+  <!-- FLAPPY MODAL -->
   <div class="modal-back" id="flBack">
     <div class="modal">
       <h2>Flappy Duck — ставка</h2>
-      <div class="msg" id="flInfo">
-        Ставишь очки → играешь. Пройди <b>40</b> столбов → получишь <b>x2</b>. Проиграл → ставка сгорает.
-      </div>
+      <div class="msg">Ставка очками. Пройди <b>40</b> → получишь <b>x2</b>. Проиграл → ставка сгорает.</div>
 
       <div class="row">
         <div>
@@ -277,7 +275,7 @@
         <button class="btn secondary" id="closeFlappy" type="button">Закрыть</button>
       </div>
 
-      <canvas id="cv" width="360" height="512" aria-label="Flappy Duck"></canvas>
+      <canvas id="cv" width="360" height="512"></canvas>
 
       <div class="flhud">
         <div>Счёт: <span id="score">0</span>/40</div>
@@ -344,7 +342,7 @@
 
   renderTap();
 
-  // ---------- RUB MODAL ----------
+  // ---------- RUB MODAL (ПЕРЕВОД) ----------
   const rubBack = document.getElementById('rubBack');
   const openRub = document.getElementById('openRub');
   const closeRub = document.getElementById('closeRub');
@@ -356,11 +354,7 @@
     rubPoints.value = String(balance);
     rubSum.value = (balance * RUB_PER_POINT).toFixed(2) + ' ₽';
   }
-
-  openRub.addEventListener('click', ()=>{
-    updateRub();
-    rubBack.classList.add('show');
-  });
+  openRub.addEventListener('click', ()=>{ updateRub(); rubBack.classList.add('show'); });
   closeRub.addEventListener('click', ()=> rubBack.classList.remove('show'));
   rubBack.addEventListener('click', (e)=>{ if (e.target === rubBack) rubBack.classList.remove('show'); });
   calcRub.addEventListener('click', updateRub);
@@ -377,27 +371,24 @@
   const flMsg = document.getElementById('flMsg');
   const restartBtn = document.getElementById('restartBtn');
 
-  openFlappy.addEventListener('click', ()=>{
-    flBack.classList.add('show');
-    syncUI();
-    draw();
-  });
+  openFlappy.addEventListener('click', ()=>{ flBack.classList.add('show'); syncUI(); draw(); });
   closeFlappy.addEventListener('click', ()=> flBack.classList.remove('show'));
   flBack.addEventListener('click', (e)=>{ if (e.target === flBack) flBack.classList.remove('show'); });
 
-  // ---------- FLAPPY GAME (чуть легче) ----------
+  // ---------- FLAPPY (ЧУТЬ ЛЕГЧЕ) ----------
   const cv = document.getElementById('cv');
   const ctx = cv.getContext('2d');
   const W = cv.width, H = cv.height;
 
   const TARGET = 40;
 
-  // легче:
-  const GRAV = 0.40;      // меньше гравитация
-  const FLAP = -7.8;      // сильнее прыжок
-  const SPEED = 2.35;     // медленнее трубы
-  const GAP = 175;        // шире дырка
+  // БЫЛО сложнее — СТАЛО ЧУТЬ легче:
+  const GRAV = 0.44;     // было 0.45
+  const FLAP = -7.55;    // было -7.3
+  const SPEED = 2.50;    // было 2.6
+  const GAP = 165;       // было 150
   const PIPE_W = 64;
+  const SPAWN_EVERY = 100; // было 95
 
   let state = 'idle'; // idle, play, over, win
   let stake = 0;
@@ -406,7 +397,6 @@
   const duck = { x: 90, y: H/2, vy: 0, r: 16 };
   const pipes = [];
   let spawnTimer = 0;
-  const SPAWN_EVERY = 105; // реже спавн
 
   function setMsg(text, kind){
     flMsg.className = 'msg ' + (kind || '');
@@ -454,7 +444,7 @@
   function win(){
     if (state !== 'play') return;
     state = 'win';
-    balance += (stake * 2); // x2
+    balance += (stake * 2);
     saveTap();
     setMsg(`✅ Победа! Выигрыш: <b>${stake} × 2</b>.`, 'good');
     syncUI();
@@ -488,7 +478,20 @@
       }
       if (hitPipe(p)) gameOver();
     }
+
     while (pipes.length && pipes[0].x + PIPE_W < -20) pipes.shift();
+  }
+
+  function roundRect(x,y,w,h,r,fill,stroke){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+    if (fill) ctx.fill();
+    if (stroke) ctx.stroke();
   }
 
   function drawDuck(x,y,rot){
@@ -513,17 +516,7 @@
 
     ctx.restore();
   }
-  function roundRect(x,y,w,h,r,fill,stroke){
-    ctx.beginPath();
-    ctx.moveTo(x+r,y);
-    ctx.arcTo(x+w,y,x+w,y+h,r);
-    ctx.arcTo(x+w,y+h,x,y+h,r);
-    ctx.arcTo(x,y+h,x,y,r);
-    ctx.arcTo(x,y,x+w,y,r);
-    ctx.closePath();
-    if (fill) ctx.fill();
-    if (stroke) ctx.stroke();
-  }
+
   function drawBackground(){
     ctx.clearRect(0,0,W,H);
     const g = ctx.createLinearGradient(0,0,0,H);
@@ -543,6 +536,7 @@
     ctx.fillStyle = 'rgba(15,23,42,.08)';
     ctx.fillRect(0,H-28,W,28);
   }
+
   function drawPipes(){
     for (const p of pipes){
       ctx.fillStyle = 'rgba(15,23,42,.18)';
@@ -557,6 +551,7 @@
       ctx.strokeRect(p.x, by, PIPE_W, H - by - 28);
     }
   }
+
   function drawOverlay(text){
     ctx.fillStyle = 'rgba(255,255,255,.80)';
     ctx.strokeStyle = 'rgba(15,23,42,.10)';
@@ -574,10 +569,10 @@
     ctx.font = '900 13px system-ui';
     ctx.fillText('Тап/клик/пробел — прыжок', W/2, by+64);
   }
+
   function draw(){
     drawBackground();
     drawPipes();
-
     const rot = Math.max(-0.6, Math.min(0.8, duck.vy * 0.06));
     drawDuck(duck.x, duck.y, rot);
 
@@ -590,6 +585,7 @@
     if (state === 'over') drawOverlay('Проиграл. Нажми “Рестарт”');
     if (state === 'win') drawOverlay('Победа! Нажми “Рестарт”');
   }
+
   function loop(){
     if (state === 'play') update();
     draw();
@@ -621,3 +617,4 @@
 </script>
 </body>
 </html>
+
